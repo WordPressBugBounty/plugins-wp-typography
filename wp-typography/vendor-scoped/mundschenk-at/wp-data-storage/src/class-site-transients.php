@@ -42,7 +42,7 @@ class Site_Transients extends Transients
     public function get_keys_from_database()
     {
         // If we are not running on multisite, fall back to the parent implementation.
-        if (!\is_multisite()) {
+        if (!is_multisite()) {
             return parent::get_keys_from_database();
         }
         /**

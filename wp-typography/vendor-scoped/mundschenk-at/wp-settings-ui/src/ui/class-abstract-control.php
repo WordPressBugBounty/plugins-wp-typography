@@ -187,7 +187,7 @@ abstract class Abstract_Control implements Control
         $this->outer_attributes = $outer_attributes;
         $this->settings_args = $settings_args;
         $this->sanitize_callback = $sanitize_callback;
-        $this->base_path = \dirname(\dirname(__DIR__));
+        $this->base_path = dirname(dirname(__DIR__));
     }
     /**
      * Prepares keyowrd arguments passed via an array for usage.
@@ -246,7 +246,7 @@ abstract class Abstract_Control implements Control
      *
      * @return string
      */
-    protected abstract function get_element_markup();
+    abstract protected function get_element_markup();
     /**
      * Render the HTML representation of the control.
      */
@@ -333,7 +333,7 @@ abstract class Abstract_Control implements Control
      */
     protected function label_has_placeholder()
     {
-        return \false !== \strpos($this->label, '%1$s');
+        return \false !== strpos($this->label, '%1$s');
     }
     /**
      * Determines if this control has an inline help text to display.
@@ -353,7 +353,7 @@ abstract class Abstract_Control implements Control
     public function get_label()
     {
         if ($this->label_has_placeholder()) {
-            return \sprintf($this->label, $this->get_element_markup());
+            return sprintf($this->label, $this->get_element_markup());
         } else {
             return $this->label;
         }

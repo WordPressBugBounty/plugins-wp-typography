@@ -63,7 +63,7 @@ class Cache extends Abstract_Cache
      */
     public function invalidate()
     {
-        $this->incrementor = \time();
+        $this->incrementor = time();
         \wp_cache_set($this->incrementor_key, $this->incrementor, $this->group, 0);
     }
     /**

@@ -62,7 +62,7 @@ abstract class Abstract_Cache
      *
      * @return void
      */
-    public abstract function invalidate();
+    abstract public function invalidate();
     /**
      * Retrieves a cached value.
      *
@@ -70,7 +70,7 @@ abstract class Abstract_Cache
      *
      * @return mixed
      */
-    public abstract function get($key);
+    abstract public function get($key);
     /**
      * Sets an entry in the cache and stores the key.
      *
@@ -80,7 +80,7 @@ abstract class Abstract_Cache
      *
      * @return bool True if the cache could be set successfully.
      */
-    public abstract function set($key, $value, $duration = 0);
+    abstract public function set($key, $value, $duration = 0);
     /**
      * Deletes an entry from the cache.
      *
@@ -88,7 +88,7 @@ abstract class Abstract_Cache
      *
      * @return bool True on successful removal, false on failure.
      */
-    public abstract function delete($key);
+    abstract public function delete($key);
     /**
      * Retrieves the complete key to use.
      *

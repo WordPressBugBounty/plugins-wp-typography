@@ -60,7 +60,7 @@ class Options
     public function get($option, $default = null, $raw = \false)
     {
         $value = \get_option($raw ? $option : $this->get_name($option), $default);
-        if (\is_array($default) && '' === $value) {
+        if (is_array($default) && '' === $value) {
             $value = [];
         }
         return $value;

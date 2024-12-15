@@ -63,7 +63,7 @@ class Transients extends Abstract_Cache
             }
         }
         // Update incrementor.
-        $this->incrementor = \time();
+        $this->incrementor = time();
         $this->set($this->incrementor_key, $this->incrementor, 0, \true);
     }
     /**
