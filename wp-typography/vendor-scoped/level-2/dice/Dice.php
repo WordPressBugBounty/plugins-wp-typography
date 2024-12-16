@@ -74,7 +74,6 @@ class Dice
      */
     public function getRule(string $name): array
     {
-        error_log("getRule for {$name}");
         $lcName = strtolower(ltrim($name, '\\'));
         if (isset($this->rules[$lcName])) {
             return $this->rules[$lcName];
