@@ -3,7 +3,7 @@
 /**
  * This file is part of mundschenk-at/wp-data-storage.
  *
- * Copyright 2018-2024 Peter Putzer.
+ * Copyright 2018 Peter Putzer.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -38,7 +38,7 @@ class Network_Options extends Options
      *
      * @var int
      */
-    private int $network_id;
+    private $network_id;
     /**
      * Create new Network Options instance.
      *
@@ -53,18 +53,16 @@ class Network_Options extends Options
     /**
      * Retrieves an option value.
      *
-     * @since 2.0.0 Parameter `$default` renamed to `$default_value`.
-     *
-     * @param string $option       The option name (without the plugin-specific prefix).
-     * @param mixed  $default_value Optional. Default value to return if the option does not exist. Default null.
-     * @param bool   $raw          Optional. Use the raw option name (i.e. don't call get_name). Default false.
+     * @param string $option  The option name (without the plugin-specific prefix).
+     * @param mixed  $default Optional. Default value to return if the option does not exist. Default null.
+     * @param bool   $raw     Optional. Use the raw option name (i.e. don't call get_name). Default false.
      *
      * @return mixed Value set for the option.
      */
-    public function get(string $option, $default_value = null, bool $raw = \false)
+    public function get($option, $default = null, $raw = \false)
     {
-        $value = \get_network_option($this->network_id, $raw ? $option : $this->get_name($option), $default_value);
-        if (is_array($default_value) && '' === $value) {
+        $value = \get_network_option($this->network_id, $raw ? $option : $this->get_name($option), $default);
+        if (is_array($default) && '' === $value) {
             $value = [];
         }
         return $value;
@@ -80,7 +78,7 @@ class Network_Options extends Options
      *
      * @return bool False if value was not updated and true if value was updated.
      */
-    public function set(string $option, $value, bool $autoload = \true, bool $raw = \false): bool
+    public function set($option, $value, $autoload = \true, $raw = \false)
     {
         return \update_network_option($this->network_id, $raw ? $option : $this->get_name($option), $value);
     }
@@ -92,7 +90,7 @@ class Network_Options extends Options
      *
      * @return bool True, if option is successfully deleted. False on failure.
      */
-    public function delete(string $option, bool $raw = \false): bool
+    public function delete($option, $raw = \false)
     {
         return \delete_network_option($this->network_id, $raw ? $option : $this->get_name($option));
     }

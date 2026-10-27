@@ -3,7 +3,7 @@
 /**
  * This file is part of mundschenk-at/wp-data-storage.
  *
- * Copyright 2017-2024 Peter Putzer.
+ * Copyright 2017-2018 Peter Putzer.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -38,13 +38,13 @@ abstract class Abstract_Cache
      *
      * @var int
      */
-    protected int $incrementor;
+    protected $incrementor;
     /**
      * The prefix added to all keys.
      *
      * @var string
      */
-    private string $prefix;
+    private $prefix;
     /**
      * Create new cache instance.
      *
@@ -58,11 +58,11 @@ abstract class Abstract_Cache
         }
     }
     /**
-     * Invalidate all cached elements by resetting the incrementor.
+     * Invalidate all cached elements by reseting the incrementor.
      *
      * @return void
      */
-    abstract public function invalidate(): void;
+    abstract public function invalidate();
     /**
      * Retrieves a cached value.
      *
@@ -70,7 +70,7 @@ abstract class Abstract_Cache
      *
      * @return mixed
      */
-    abstract public function get(string $key);
+    abstract public function get($key);
     /**
      * Sets an entry in the cache and stores the key.
      *
@@ -80,7 +80,7 @@ abstract class Abstract_Cache
      *
      * @return bool True if the cache could be set successfully.
      */
-    abstract public function set(string $key, $value, int $duration = 0): bool;
+    abstract public function set($key, $value, $duration = 0);
     /**
      * Deletes an entry from the cache.
      *
@@ -88,7 +88,7 @@ abstract class Abstract_Cache
      *
      * @return bool True on successful removal, false on failure.
      */
-    abstract public function delete(string $key): bool;
+    abstract public function delete($key);
     /**
      * Retrieves the complete key to use.
      *
@@ -96,7 +96,7 @@ abstract class Abstract_Cache
      *
      * @return string
      */
-    protected function get_key(string $key): string
+    protected function get_key($key)
     {
         return "{$this->prefix}{$this->incrementor}_{$key}";
     }
@@ -105,7 +105,7 @@ abstract class Abstract_Cache
      *
      * @return string
      */
-    protected function get_prefix(): string
+    protected function get_prefix()
     {
         return $this->prefix;
     }

@@ -1,10 +1,8 @@
 === wp-Typography ===
 Contributors: pputzer, kingjeffrey
-Tags: typography, hyphenation, smart quotes, widows, typogrify
+Tags: typography, hyphenation, smart quotes, formatting, widows, orphans, typogrify, quotes, prettify, small caps, diacritics
 Tested up to: 6.7
-Stable tag: 5.11.0
-License: GPLv2 or later
-License URI: https://www.gnu.org/licenses/gpl-2.0.html
+Stable tag: 5.10.1
 
 Improve your web typography with: hyphenation, space control, intelligent character replacement, and CSS hooks.
 
@@ -78,9 +76,6 @@ Remember, many more FAQs are are addressed the [wp-Typography website](https://c
 4. wp-Typography "Add CSS Hooks" settings page.
 
 == Changelog ==
-
-= 5.11.0 - February 23, 2025 =
-* _Bugfix_: Don't crash when a runtime requirement is not met.
 
 = 5.10.1 - December 16, 2024 =
 * _Bugfix_: A debug message intended for local use accidentally got into the build of 5.10.0.

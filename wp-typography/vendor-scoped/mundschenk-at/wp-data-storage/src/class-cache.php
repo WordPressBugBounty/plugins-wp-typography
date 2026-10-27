@@ -3,7 +3,7 @@
 /**
  * This file is part of mundschenk-at/wp-data-storage.
  *
- * Copyright 2017-2024 Peter Putzer.
+ * Copyright 2017-2018 Peter Putzer.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -25,7 +25,7 @@
 namespace WP_Typography\Vendor\Mundschenk\Data_Storage;
 
 /**
- * Implements an interface to the WordPress Object Cache.
+ * Implements an inteface to the WordPress Object Cache.
  *
  * @since 1.0.0
  *
@@ -38,13 +38,13 @@ class Cache extends Abstract_Cache
      *
      * @var string
      */
-    private string $incrementor_key;
+    private $incrementor_key;
     /**
      * The cache group.
      *
      * @var string
      */
-    private string $group;
+    private $group;
     /**
      * Create new cache instance.
      *
@@ -55,15 +55,13 @@ class Cache extends Abstract_Cache
     {
         $this->group = !isset($group) ? $prefix : $group;
         $this->incrementor_key = "{$prefix}cache_incrementor";
-        $incrementor = \wp_cache_get($this->incrementor_key, $this->group);
-        $incrementor = \is_int($incrementor) ? $incrementor : 0;
-        $this->incrementor = $incrementor;
+        $this->incrementor = (int) \wp_cache_get($this->incrementor_key, $this->group);
         parent::__construct($prefix);
     }
     /**
-     * Invalidate all cached elements by resetting the incrementor.
+     * Invalidate all cached elements by reseting the incrementor.
      */
-    public function invalidate(): void
+    public function invalidate()
     {
         $this->incrementor = time();
         \wp_cache_set($this->incrementor_key, $this->incrementor, $this->group, 0);
@@ -76,7 +74,7 @@ class Cache extends Abstract_Cache
      *
      * @return mixed
      */
-    public function get(string $key, ?bool &$found = null)
+    public function get($key, &$found = null)
     {
         return \wp_cache_get($this->get_key($key), $this->group, \false, $found);
     }
@@ -89,7 +87,7 @@ class Cache extends Abstract_Cache
      *
      * @return bool True if the cache could be set successfully.
      */
-    public function set(string $key, $value, int $duration = 0): bool
+    public function set($key, $value, $duration = 0)
     {
         return \wp_cache_set($this->get_key($key), $value, $this->group, $duration);
     }
@@ -100,7 +98,7 @@ class Cache extends Abstract_Cache
      *
      * @return bool True on successful removal, false on failure.
      */
-    public function delete(string $key): bool
+    public function delete($key)
     {
         return \wp_cache_delete($this->get_key($key), $this->group);
     }

@@ -3,7 +3,7 @@
 /**
  *  This file is part of WordPress Settings UI.
  *
- *  Copyright 2019-2024 Peter Putzer.
+ *  Copyright 2019 Peter Putzer.
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -26,11 +26,10 @@
  */
 namespace WP_Typography\Vendor\Mundschenk\UI\Controls;
 
+use WP_Typography\Vendor\Mundschenk\UI\Control;
 use WP_Typography\Vendor\Mundschenk\Data_Storage\Options;
 /**
  * HTML <input> element.
- *
- * @phpstan-import-type Input_Arguments from Input
  */
 class Text_Input extends Input
 {
@@ -38,7 +37,7 @@ class Text_Input extends Input
      * Create a new input control object.
      *
      * @param Options $options      Options API handler.
-     * @param ?string $options_key  Database key for the options array. Passing '' means that the control ID is used instead.
+     * @param string  $options_key  Database key for the options array. Passing '' means that the control ID is used instead.
      * @param string  $id           Control ID (equivalent to option name). Required.
      * @param array   $args {
      *    Optional and required arguments.
@@ -55,10 +54,8 @@ class Text_Input extends Input
      * }
      *
      * @throws \InvalidArgumentException Missing argument.
-     *
-     * @phpstan-param Input_Arguments $args
      */
-    public function __construct(Options $options, ?string $options_key, string $id, array $args)
+    public function __construct(Options $options, $options_key, $id, array $args)
     {
         $args['input_type'] = 'text';
         parent::__construct($options, $options_key, $id, $args);
