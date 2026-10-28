@@ -3,7 +3,7 @@
 /**
  *  This file is part of PHP-Typography.
  *
- *  Copyright 2018 Peter Putzer.
+ *  Copyright 2018-2024 Peter Putzer.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -49,18 +49,20 @@ class Smart_Dashes_Hyphen_Fix extends Abstract_Token_Fix
         parent::__construct(Token_Fix::MIXED_WORDS, $feed_compatible);
     }
     /**
-     * Apply the tweak to a given textnode.
+     * Apply the fix to a given set of tokens
      *
-     * @param Token[]       $tokens   Required.
-     * @param Settings      $settings Required.
-     * @param bool          $is_title Optional. Default false.
-     * @param \DOMText|null $textnode Optional. Default null.
+     * @since 7.0.0 The parameter order has been re-arranged to mirror Node_Fix.
      *
-     * @return Token[] An array of tokens.
+     * @param Token[]  $tokens   The set of tokens.
+     * @param \DOMText $textnode The context DOM node.
+     * @param Settings $settings The settings to apply.
+     * @param bool     $is_title Indicates if the processed tokens occur in a title/heading context.
+     *
+     * @return Token[]           The fixed set of tokens.
      */
-    public function apply(array $tokens, Settings $settings, $is_title = \false, \DOMText $textnode = null)
+    public function apply(array $tokens, \DOMText $textnode, Settings $settings, $is_title)
     {
-        if (!empty($settings[Settings::SMART_DASHES])) {
+        if (!empty($settings->smart_dashes)) {
             foreach ($tokens as $index => $text_token) {
                 // Handled here because we need to know we are inside a word and not a URL.
                 $tokens[$index] = $text_token->with_value(\str_replace('-', U::HYPHEN, $text_token->value));

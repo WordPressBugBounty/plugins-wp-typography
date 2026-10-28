@@ -3,7 +3,7 @@
 /**
  *  This file is part of PHP-Typography.
  *
- *  Copyright 2017-2022 Peter Putzer.
+ *  Copyright 2017-2024 Peter Putzer.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@ use WP_Typography\Vendor\PHP_Typography\Settings;
 use WP_Typography\Vendor\PHP_Typography\Text_Parser\Token;
 use WP_Typography\Vendor\PHP_Typography\U;
 /**
- * Wraps hard hypens with zero-width spaces (if enabled).
+ * Wraps hard hyphens with zero-width spaces (if enabled).
  *
  * @author Peter Putzer <github@mundschenk.at>
  *
@@ -63,27 +63,26 @@ class Wrap_Hard_Hyphens_Fix extends Abstract_Token_Fix
         $this->remove_ending_space_regex = '/(' . \implode('|', $this->hyphens_array) . ')' . U::ZERO_WIDTH_SPACE . '$/';
     }
     /**
-     * Apply the tweak to a given textnode.
+     * Apply the fix to a given set of tokens
      *
-     * @param Token[]       $tokens   Required.
-     * @param Settings      $settings Required.
-     * @param bool          $is_title Optional. Default false.
-     * @param \DOMText|null $textnode Optional. Default null.
+     * @since 7.0.0 The parameter order has been re-arranged to mirror Node_Fix.
      *
-     * @return Token[] An array of tokens.
+     * @param Token[]  $tokens   The set of tokens.
+     * @param \DOMText $textnode The context DOM node.
+     * @param Settings $settings The settings to apply.
+     * @param bool     $is_title Indicates if the processed tokens occur in a title/heading context.
+     *
+     * @return Token[]           The fixed set of tokens.
      */
-    public function apply(array $tokens, Settings $settings, $is_title = \false, \DOMText $textnode = null)
+    public function apply(array $tokens, \DOMText $textnode, Settings $settings, $is_title)
     {
-        if (!empty($settings[Settings::HYPHEN_HARD_WRAP])) {
+        if (!empty($settings->wrap_hard_hyphens)) {
             foreach ($tokens as $index => $text_token) {
                 $value = $text_token->value;
-                if (isset($settings[Settings::HYPHEN_HARD_WRAP]) && $settings[Settings::HYPHEN_HARD_WRAP]) {
-                    // @phpstan-ignore-line -- Right side is not always true.
-                    $value = \str_replace($this->hyphens_array, '-' . U::ZERO_WIDTH_SPACE, $value);
-                    $value = \str_replace('_', '_' . U::ZERO_WIDTH_SPACE, $value);
-                    $value = \str_replace('/', '/' . U::ZERO_WIDTH_SPACE, $value);
-                    $value = \preg_replace($this->remove_ending_space_regex, '$1', $value);
-                }
+                $value = \str_replace($this->hyphens_array, '-' . U::ZERO_WIDTH_SPACE, $value);
+                $value = \str_replace('_', '_' . U::ZERO_WIDTH_SPACE, $value);
+                $value = \str_replace('/', '/' . U::ZERO_WIDTH_SPACE, $value);
+                $value = (string) \preg_replace($this->remove_ending_space_regex, '$1', $value);
                 $tokens[$index] = $text_token->with_value($value);
             }
         }
@@ -91,7 +90,7 @@ class Wrap_Hard_Hyphens_Fix extends Abstract_Token_Fix
     }
 }
 /**
- * Wraps hard hypens with zero-width spaces (if enabled).
+ * Wraps hard hyphens with zero-width spaces (if enabled).
  *
  * @author Peter Putzer <github@mundschenk.at>
  *

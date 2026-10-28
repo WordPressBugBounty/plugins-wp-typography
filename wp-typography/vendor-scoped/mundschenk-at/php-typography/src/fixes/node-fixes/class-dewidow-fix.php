@@ -3,7 +3,7 @@
 /**
  *  This file is part of PHP-Typography.
  *
- *  Copyright 2014-2022 Peter Putzer.
+ *  Copyright 2014-2024 Peter Putzer.
  *  Copyright 2009-2011 KINGdesk, LLC.
  *
  *  This program is free software; you can redistribute it and/or modify modify
@@ -28,7 +28,6 @@
 namespace WP_Typography\Vendor\PHP_Typography\Fixes\Node_Fixes;
 
 use WP_Typography\Vendor\PHP_Typography\DOM;
-use WP_Typography\Vendor\PHP_Typography\RE;
 use WP_Typography\Vendor\PHP_Typography\Settings;
 use WP_Typography\Vendor\PHP_Typography\Strings;
 use WP_Typography\Vendor\PHP_Typography\U;
@@ -38,6 +37,8 @@ use WP_Typography\Vendor\PHP_Typography\U;
  * @author Peter Putzer <github@mundschenk.at>
  *
  * @since 5.0.0
+ *
+ * @phpstan-import-type String_Functions from \PHP_Typography\Strings
  */
 class Dewidow_Fix extends Abstract_Node_Fix
 {
@@ -45,7 +46,7 @@ class Dewidow_Fix extends Abstract_Node_Fix
     // \s includes all special spaces (but not ZWSP) with the u flag.
     const WIDOW = '[\w\p{M}\-' . U::HYPHEN . U::ZERO_WIDTH_SPACE . U::SOFT_HYPHEN . ']+?';
     // \w includes all alphanumeric Unicode characters but not composed characters.
-    // Mandatory UTF-8 modifer.
+    // Mandatory UTF-8 modifier.
     const REGEX_START = '/
 		(?:
 			\A
@@ -78,20 +79,24 @@ class Dewidow_Fix extends Abstract_Node_Fix
     /**
      * Apply the fix to a given textnode.
      *
-     * @param \DOMText $textnode Required.
-     * @param Settings $settings Required.
-     * @param bool     $is_title Optional. Default false.
+     * @since 7.0.0 All parameters are now required.
+     *
+     * @param \DOMText $textnode The DOM node.
+     * @param Settings $settings The settings to apply.
+     * @param bool     $is_title Indicates if the processed tokens occur in a title/heading context.
+     *
+     * @return void
      */
-    public function apply(\DOMText $textnode, Settings $settings, $is_title = \false)
+    public function apply(\DOMText $textnode, Settings $settings, $is_title)
     {
         // Intervening inline tags may interfere with widow identification, but that is a sacrifice of using the parser.
         // Intervening tags will only interfere if they separate the widow from previous or preceding whitespace.
-        if (empty($settings[Settings::DEWIDOW]) || empty($settings[Settings::DEWIDOW_MAX_PULL]) || empty($settings[Settings::DEWIDOW_MAX_LENGTH])) {
+        if (empty($settings->dewidow) || empty($settings->max_dewidow_pull) || empty($settings->max_dewidow_length)) {
             return;
         }
-        if ('' === DOM::get_next_chr($textnode)) {
+        if ('' === DOM::get_next_character($textnode)) {
             // We have the last type "text" child of a block level element.
-            $textnode->data = $this->dewidow($textnode->data, Strings::functions($textnode->data), $settings[Settings::DEWIDOW_MAX_PULL], $settings[Settings::DEWIDOW_MAX_LENGTH], $settings[Settings::DEWIDOW_WORD_NUMBER]);
+            $textnode->data = $this->dewidow($textnode->data, Strings::functions($textnode->data), $settings->max_dewidow_pull, $settings->max_dewidow_length, $settings->dewidow_word_number);
         }
     }
     /**
@@ -107,6 +112,8 @@ class Dewidow_Fix extends Abstract_Node_Fix
      * @param  int     $word_number  Maximum number of words allowed in widow.
      *
      * @return string
+     *
+     * @phpstan-param String_Functions $func
      */
     protected function dewidow($text, array $func, $max_pull, $max_length, $word_number)
     {
@@ -115,17 +122,17 @@ class Dewidow_Fix extends Abstract_Node_Fix
             // We are done.
         }
         // Do what we have to do.
-        return \preg_replace_callback(self::REGEX_START . ($word_number - 1) . self::REGEX_END, function (array $widow) use ($func, $max_pull, $max_length, $word_number) {
+        return (string) \preg_replace_callback(self::REGEX_START . ($word_number - 1) . self::REGEX_END, function (array $widow) use ($func, $max_pull, $max_length, $word_number) {
             // If we are here, we know that widows are being protected in some fashion
             // with that, we will assert that widows should never be hyphenated or wrapped
             // as such, we will strip soft hyphens and zero-width-spaces.
             $widow['widow'] = self::strip_breaking_characters($widow['widow']);
-            $widow['trailing'] = self::strip_breaking_characters(self::make_space_nonbreaking($widow['trailing'], U::NO_BREAK_NARROW_SPACE, $func['u']));
+            $widow['trailing'] = self::strip_breaking_characters(self::make_space_nonbreaking($widow['trailing'], $func['u']));
             if ('' === $widow['space_before'] || \false !== \strpos($widow['space_before'], U::NO_BREAK_SPACE) || $func['strlen']($widow['neighbor']) > $max_pull || $func['strlen']($widow['widow']) > $max_length || self::is_narrow_space($widow['space_between'])) {
                 return $widow['space_before'] . $widow['neighbor'] . $this->dewidow($widow['space_between'] . $widow['widow'] . $widow['trailing'], $func, $max_pull, $max_length, $word_number - 1);
             }
             // Let's protect some widows!
-            return $widow['space_before'] . $widow['neighbor'] . U::NO_BREAK_SPACE . self::make_space_nonbreaking($widow['widow'], U::NO_BREAK_NARROW_SPACE, $func['u']) . $widow['trailing'];
+            return $widow['space_before'] . $widow['neighbor'] . U::NO_BREAK_SPACE . self::make_space_nonbreaking($widow['widow'], $func['u']) . $widow['trailing'];
         }, $text);
     }
     /**
@@ -156,16 +163,16 @@ class Dewidow_Fix extends Abstract_Node_Fix
      * Strip zero-width space and soft hyphens from the given string.
      *
      * @since 6.5.0 Parameter $narrow_space has been deprecated.
+     * @since 7.0.0 Parameter $deprecated (formerly $narrow_space) removed.
      *
      * @param  string $string     Required.
-     * @param  string $deprecated Ignored.
      * @param  string $u          Either 'u' or the empty string.
      *
      * @return string
      */
-    protected static function make_space_nonbreaking($string, $deprecated, $u)
+    protected static function make_space_nonbreaking($string, $u)
     {
-        return \preg_replace(['/\s*(?:' . U::THIN_SPACE . '|' . U::NO_BREAK_NARROW_SPACE . ')\s*/Su', "/\\s+/S{$u}", '/' . self::MASKED_NARROW_SPACE . "/S{$u}"], [self::MASKED_NARROW_SPACE, U::NO_BREAK_SPACE, U::NO_BREAK_NARROW_SPACE], $string);
+        return (string) \preg_replace(['/\s*(?:' . U::THIN_SPACE . '|' . U::NO_BREAK_NARROW_SPACE . ')\s*/Su', "/\\s+/S{$u}", '/' . self::MASKED_NARROW_SPACE . "/S{$u}"], [self::MASKED_NARROW_SPACE, U::NO_BREAK_SPACE, U::NO_BREAK_NARROW_SPACE], $string);
     }
 }
 /**
@@ -174,5 +181,7 @@ class Dewidow_Fix extends Abstract_Node_Fix
  * @author Peter Putzer <github@mundschenk.at>
  *
  * @since 5.0.0
+ *
+ * @phpstan-import-type String_Functions from \PHP_Typography\Strings
  */
 \class_alias('WP_Typography\Vendor\PHP_Typography\Fixes\Node_Fixes\Dewidow_Fix', 'PHP_Typography\Fixes\Node_Fixes\Dewidow_Fix', \false);

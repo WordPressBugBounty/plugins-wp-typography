@@ -3,7 +3,7 @@
 /**
  *  This file is part of PHP-Typography.
  *
- *  Copyright 2017-2019 Peter Putzer.
+ *  Copyright 2017-2024 Peter Putzer.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -27,7 +27,6 @@
 namespace WP_Typography\Vendor\PHP_Typography\Fixes\Node_Fixes;
 
 use WP_Typography\Vendor\PHP_Typography\Settings;
-use WP_Typography\Vendor\PHP_Typography\DOM;
 /**
  * Wraps numbers in <span class="numbers"> (even numbers that appear inside a word,
  * i.e. A9 becomes A<span class="numbers">9</span>), if enabled.

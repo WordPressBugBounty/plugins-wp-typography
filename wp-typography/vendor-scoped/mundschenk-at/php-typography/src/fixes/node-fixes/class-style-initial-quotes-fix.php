@@ -3,7 +3,7 @@
 /**
  *  This file is part of PHP-Typography.
  *
- *  Copyright 2017-2022 Peter Putzer.
+ *  Copyright 2017-2024 Peter Putzer.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -69,14 +69,17 @@ class Style_Initial_Quotes_Fix extends Classes_Dependent_Fix
      * Apply the fix to a given textnode.
      *
      * @since 6.0.0 The method was accidentally made public and is now protected.
+     * @since 7.0.0 All parameters are now required.
      *
-     * @param \DOMText $textnode Required.
-     * @param Settings $settings Required.
-     * @param bool     $is_title Optional. Default false.
+     * @param \DOMText $textnode The DOM node.
+     * @param Settings $settings The settings to apply.
+     * @param bool     $is_title Indicates if the processed tokens occur in a title/heading context.
+     *
+     * @return void
      */
-    protected function apply_internal(\DOMText $textnode, Settings $settings, $is_title = \false)
+    protected function apply_internal(\DOMText $textnode, Settings $settings, $is_title)
     {
-        if (empty($settings[Settings::STYLE_INITIAL_QUOTES]) || empty($settings[Settings::INITIAL_QUOTE_TAGS]) || null !== DOM::get_previous_textnode($textnode)) {
+        if (empty($settings->style_initial_quotes) || empty($settings->initial_quote_tags) || DOM::get_first_textnode($textnode) !== $textnode) {
             return;
         }
         $node_data = $textnode->data;
@@ -93,8 +96,8 @@ class Style_Initial_Quotes_Fix extends Classes_Dependent_Fix
         }
         if (!empty($span_class)) {
             // Assume page title is <h2>.
-            $block_level_parent = $is_title ? 'h2' : DOM::get_block_parent_name($textnode);
-            if (!empty($block_level_parent) && isset($settings[Settings::INITIAL_QUOTE_TAGS][$block_level_parent])) {
+            $block_level_parent = $is_title ? 'h2' : DOM::get_block_parent($textnode)->tagName ?? '';
+            if (!empty($block_level_parent) && isset($settings->initial_quote_tags[$block_level_parent])) {
                 $textnode->data = RE::escape_tags('<span class="' . $span_class . '">') . $first_character . RE::escape_tags('</span>') . $f['substr']($node_data, 1, $f['strlen']($node_data));
             }
         }

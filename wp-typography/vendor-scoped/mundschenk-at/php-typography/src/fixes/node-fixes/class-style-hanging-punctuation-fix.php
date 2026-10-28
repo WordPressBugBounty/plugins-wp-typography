@@ -3,7 +3,7 @@
 /**
  *  This file is part of PHP-Typography.
  *
- *  Copyright 2017-2022 Peter Putzer.
+ *  Copyright 2017-2024 Peter Putzer.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -37,43 +37,13 @@ use WP_Typography\Vendor\PHP_Typography\U;
  * @author Peter Putzer <github@mundschenk.at>
  *
  * @since 5.0.0
+ * @since 7.0.0 The deprecated protected properties `$push_single_class`, `$push_double_class`,
+ *              `$pull_single_class`, and `$pull_double_class` have been removed.
  */
 class Style_Hanging_Punctuation_Fix extends Classes_Dependent_Fix
 {
     /**
-     * CSS class for single-width punctuation marks.
-     *
-     * @deprecated 6.7.0
-     *
-     * @var string
-     */
-    protected $push_single_class;
-    /**
-     * CSS class for double-width punctuation marks.
-     *
-     * @deprecated 6.7.0
-     *
-     * @var string
-     */
-    protected $push_double_class;
-    /**
-     * CSS class for single-width punctuation marks.
-     *
-     * @deprecated 6.7.0
-     *
-     * @var string
-     */
-    protected $pull_single_class;
-    /**
-     * CSS class for double-width punctuation marks.
-     *
-     * @deprecated 6.7.0
-     *
-     * @var string
-     */
-    protected $pull_double_class;
-    /**
-     * An array of replacment arrays (indexed by the "$block" flag).
+     * An array of replacement arrays (indexed by the "$block" flag).
      *
      * @var array<int,string[]>
      */
@@ -113,7 +83,7 @@ class Style_Hanging_Punctuation_Fix extends Classes_Dependent_Fix
                 // STYLE_INITIAL_DOUBLE.
                 RE::escape_tags("<span class=\"{$push_single_class}\"></span>" . U::ZERO_WIDTH_SPACE . "<span class=\"{$pull_single_class}\">\$1</span>\$2"),
             ],
-            // Block eleemnts.
+            // Block elements.
             [
                 $escaped_style_double,
                 // STYLE_DOUBLE.
@@ -129,14 +99,17 @@ class Style_Hanging_Punctuation_Fix extends Classes_Dependent_Fix
      * Apply the fix to a given textnode.
      *
      * @since 6.0.0 The method was accidentally made public and is now protected.
+     * @since 7.0.0 All parameters are now required.
      *
-     * @param \DOMText $textnode Required.
-     * @param Settings $settings Required.
-     * @param bool     $is_title Optional. Default false.
+     * @param \DOMText $textnode The DOM node.
+     * @param Settings $settings The settings to apply.
+     * @param bool     $is_title Indicates if the processed tokens occur in a title/heading context.
+     *
+     * @return void
      */
-    protected function apply_internal(\DOMText $textnode, Settings $settings, $is_title = \false)
+    protected function apply_internal(\DOMText $textnode, Settings $settings, $is_title)
     {
-        if (empty($settings[Settings::STYLE_HANGING_PUNCTUATION])) {
+        if (empty($settings->style_hanging_punctuation)) {
             return;
         }
         // Look for the first textnode.
@@ -144,15 +117,15 @@ class Style_Hanging_Punctuation_Fix extends Classes_Dependent_Fix
         $block = null === $firstnode || $textnode === $firstnode;
         // Need to get context of adjacent characters outside adjacent inline tags or HTML comment
         // if we have adjacent characters add them to the text.
-        $next_character = DOM::get_next_chr($textnode);
+        $next_character = DOM::get_next_character($textnode);
         $node_data = "{$textnode->data}{$next_character}";
-        // We have no interest in preceeding characters for this fix.
+        // We have no interest in preceding characters for this fix.
         // Check encoding.
         $f = Strings::functions($node_data);
         if (empty($f)) {
             return;
         }
-        $node_data = \preg_replace([self::STYLE_DOUBLE . $f['u'], self::STYLE_SINGLE . $f['u'], self::STYLE_INITIAL_DOUBLE . $f['u'], self::STYLE_INITIAL_SINGLE . $f['u']], $this->replacements[$block], $node_data);
+        $node_data = (string) \preg_replace([self::STYLE_DOUBLE . $f['u'], self::STYLE_SINGLE . $f['u'], self::STYLE_INITIAL_DOUBLE . $f['u'], self::STYLE_INITIAL_SINGLE . $f['u']], $this->replacements[$block], $node_data);
         // Remove any added characters.
         $textnode->data = self::remove_adjacent_characters($node_data, $f['strlen'], $f['substr'], 0, $f['strlen']($next_character));
     }
@@ -163,5 +136,7 @@ class Style_Hanging_Punctuation_Fix extends Classes_Dependent_Fix
  * @author Peter Putzer <github@mundschenk.at>
  *
  * @since 5.0.0
+ * @since 7.0.0 The deprecated protected properties `$push_single_class`, `$push_double_class`,
+ *              `$pull_single_class`, and `$pull_double_class` have been removed.
  */
 \class_alias('WP_Typography\Vendor\PHP_Typography\Fixes\Node_Fixes\Style_Hanging_Punctuation_Fix', 'PHP_Typography\Fixes\Node_Fixes\Style_Hanging_Punctuation_Fix', \false);

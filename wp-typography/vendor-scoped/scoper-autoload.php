@@ -44,6 +44,7 @@ humbug_phpscoper_expose_class('PHP_Typography\Fixes\Node_Fixes\Smart_Fractions_F
 humbug_phpscoper_expose_class('PHP_Typography\Fixes\Node_Fixes\Dash_Spacing_Fix', 'WP_Typography\Vendor\PHP_Typography\Fixes\Node_Fixes\Dash_Spacing_Fix');
 humbug_phpscoper_expose_class('PHP_Typography\Fixes\Node_Fixes\Dewidow_Fix', 'WP_Typography\Vendor\PHP_Typography\Fixes\Node_Fixes\Dewidow_Fix');
 humbug_phpscoper_expose_class('PHP_Typography\Fixes\Node_Fixes\Style_Numbers_Fix', 'WP_Typography\Vendor\PHP_Typography\Fixes\Node_Fixes\Style_Numbers_Fix');
+humbug_phpscoper_expose_class('PHP_Typography\Fixes\Node_Fixes\Unicode_Remapping_Fix', 'WP_Typography\Vendor\PHP_Typography\Fixes\Node_Fixes\Unicode_Remapping_Fix');
 humbug_phpscoper_expose_class('PHP_Typography\Fixes\Node_Fixes\Smart_Maths_Fix', 'WP_Typography\Vendor\PHP_Typography\Fixes\Node_Fixes\Smart_Maths_Fix');
 humbug_phpscoper_expose_class('PHP_Typography\Fixes\Node_Fixes\Smart_Diacritics_Fix', 'WP_Typography\Vendor\PHP_Typography\Fixes\Node_Fixes\Smart_Diacritics_Fix');
 humbug_phpscoper_expose_class('PHP_Typography\Fixes\Node_Fixes\Smart_Ordinal_Suffix_Fix', 'WP_Typography\Vendor\PHP_Typography\Fixes\Node_Fixes\Smart_Ordinal_Suffix_Fix');
@@ -74,6 +75,12 @@ humbug_phpscoper_expose_class('PHP_Typography\Settings\Quotes', 'WP_Typography\V
 humbug_phpscoper_expose_class('PHP_Typography\Settings\Dashes', 'WP_Typography\Vendor\PHP_Typography\Settings\Dashes');
 humbug_phpscoper_expose_class('PHP_Typography\Settings\Dash_Style', 'WP_Typography\Vendor\PHP_Typography\Settings\Dash_Style');
 humbug_phpscoper_expose_class('PHP_Typography\U', 'WP_Typography\Vendor\PHP_Typography\U');
+humbug_phpscoper_expose_class('PHP_Typography\Exceptions\Invalid_File_Exception', 'WP_Typography\Vendor\PHP_Typography\Exceptions\Invalid_File_Exception');
+humbug_phpscoper_expose_class('PHP_Typography\Exceptions\Invalid_JSON_Exception', 'WP_Typography\Vendor\PHP_Typography\Exceptions\Invalid_JSON_Exception');
+humbug_phpscoper_expose_class('PHP_Typography\Exceptions\Invalid_Path_Exception', 'WP_Typography\Vendor\PHP_Typography\Exceptions\Invalid_Path_Exception');
+humbug_phpscoper_expose_class('PHP_Typography\Exceptions\Invalid_Style_Exception', 'WP_Typography\Vendor\PHP_Typography\Exceptions\Invalid_Style_Exception');
+humbug_phpscoper_expose_class('PHP_Typography\Exceptions\Invalid_Hyphenation_Pattern_File_Exception', 'WP_Typography\Vendor\PHP_Typography\Exceptions\Invalid_Hyphenation_Pattern_File_Exception');
+humbug_phpscoper_expose_class('PHP_Typography\Exceptions\Invalid_Encoding_Exception', 'WP_Typography\Vendor\PHP_Typography\Exceptions\Invalid_Encoding_Exception');
 humbug_phpscoper_expose_class('PHP_Typography\RE', 'WP_Typography\Vendor\PHP_Typography\RE');
 humbug_phpscoper_expose_class('PHP_Typography\PHP_Typography', 'WP_Typography\Vendor\PHP_Typography\PHP_Typography');
 humbug_phpscoper_expose_class('PHP_Typography\Text_Parser', 'WP_Typography\Vendor\PHP_Typography\Text_Parser');

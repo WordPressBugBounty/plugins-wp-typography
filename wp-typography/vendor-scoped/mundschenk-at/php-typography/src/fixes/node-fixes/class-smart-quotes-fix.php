@@ -3,7 +3,7 @@
 /**
  *  This file is part of PHP-Typography.
  *
- *  Copyright 2014-2022 Peter Putzer.
+ *  Copyright 2014-2024 Peter Putzer.
  *  Copyright 2009-2011 KINGdesk, LLC.
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -83,19 +83,23 @@ class Smart_Quotes_Fix extends Abstract_Node_Fix
     /**
      * Apply the fix to a given textnode.
      *
-     * @param \DOMText $textnode Required.
-     * @param Settings $settings Required.
-     * @param bool     $is_title Optional. Default false.
+     * @since 7.0.0 All parameters are now required.
+     *
+     * @param \DOMText $textnode The DOM node.
+     * @param Settings $settings The settings to apply.
+     * @param bool     $is_title Indicates if the processed tokens occur in a title/heading context.
+     *
+     * @return void
      */
-    public function apply(\DOMText $textnode, Settings $settings, $is_title = \false)
+    public function apply(\DOMText $textnode, Settings $settings, $is_title)
     {
-        if (empty($settings[Settings::SMART_QUOTES])) {
+        if (!$settings->smart_quotes) {
             return;
         }
         // Need to get context of adjacent characters outside adjacent inline tags or HTML comment
         // if we have adjacent characters add them to the text.
-        $previous_character = DOM::get_prev_chr($textnode);
-        $next_character = DOM::get_next_chr($textnode);
+        $previous_character = DOM::get_previous_character($textnode);
+        $next_character = DOM::get_next_character($textnode);
         $node_data = "{$previous_character}{$textnode->data}{$next_character}";
         // Check encoding.
         $f = Strings::functions($node_data);
@@ -103,29 +107,29 @@ class Smart_Quotes_Fix extends Abstract_Node_Fix
             return;
         }
         // Various special characters and regular expressions.
-        $double = $settings->primary_quote_style();
-        $single = $settings->secondary_quote_style();
+        $double = $settings->primary_quote_style;
+        $single = $settings->secondary_quote_style;
         // Mark quotes to ensure proper removal of replaced adjacent characters.
         $double_open = RE::ESCAPE_MARKER . $double->open() . RE::ESCAPE_MARKER;
         $double_close = RE::ESCAPE_MARKER . $double->close() . RE::ESCAPE_MARKER;
         $single_open = RE::ESCAPE_MARKER . $single->open() . RE::ESCAPE_MARKER;
         $single_close = RE::ESCAPE_MARKER . $single->close() . RE::ESCAPE_MARKER;
         if ($double != $this->cached_primary_quotes || $single != $this->cached_secondary_quotes) {
-            // phpcs:ignore WordPress.PHP.StrictComparisons.LooseComparison -- object value comparison.
+            // phpcs:ignore Universal.Operators.StrictComparisons.LooseNotEqual -- object value comparison.
             $this->update_smart_quotes_brackets($double_open, $double_close, $single_open, $single_close);
             $this->cached_primary_quotes = $double;
             $this->cached_secondary_quotes = $single;
         }
-        // Handle excpetions first.
-        if (!empty($settings[Settings::SMART_QUOTES_EXCEPTIONS])) {
-            $node_data = \str_replace($settings[Settings::SMART_QUOTES_EXCEPTIONS]['patterns'], $settings[Settings::SMART_QUOTES_EXCEPTIONS]['replacements'], $node_data);
+        // Handle exceptions first.
+        if (!empty($settings->smart_quotes_exceptions)) {
+            $node_data = \str_replace($settings->smart_quotes_exceptions['patterns'], $settings->smart_quotes_exceptions['replacements'], $node_data);
         }
         // Before primes, handle quoted numbers (and quotes ending in numbers).
-        $node_data = \preg_replace([self::SINGLE_QUOTED_NUMBERS . $f['u'], self::DOUBLE_QUOTED_NUMBERS . $f['u']], ["{$single_open}\$1{$single_close}", "{$double_open}\$1{$double_close}"], $node_data);
+        $node_data = (string) \preg_replace([self::SINGLE_QUOTED_NUMBERS . $f['u'], self::DOUBLE_QUOTED_NUMBERS . $f['u']], ["{$single_open}\$1{$single_close}", "{$double_open}\$1{$double_close}"], $node_data);
         // Guillemets.
         $node_data = \str_replace(['<<', '>>'], [U::GUILLEMET_OPEN, U::GUILLEMET_CLOSE], $node_data);
         // Primes.
-        $node_data = \preg_replace([
+        $node_data = (string) \preg_replace([
             self::SINGLE_DOUBLE_PRIME . $f['u'],
             self::DOUBLE_PRIME . $f['u'],
             // should not interfere with regular quote matching.
@@ -138,14 +142,14 @@ class Smart_Quotes_Fix extends Abstract_Node_Fix
         ], $node_data);
         // Backticks & comma quotes.
         $node_data = \str_replace(['``', '`', "''", ',,'], [$double_open, $single_open, $double_close, U::DOUBLE_LOW_9_QUOTE], $node_data);
-        $node_data = \preg_replace(self::COMMA_QUOTE . $f['u'], U::SINGLE_LOW_9_QUOTE, $node_data);
+        $node_data = (string) \preg_replace(self::COMMA_QUOTE . $f['u'], U::SINGLE_LOW_9_QUOTE, $node_data);
         // like _,¿hola?'_.
         // Apostrophes.
-        $node_data = \preg_replace([self::APOSTROPHE_WORDS . $f['u'], self::APOSTROPHE_DECADES . $f['u']], [U::APOSTROPHE, U::APOSTROPHE . '$1'], $node_data);
+        $node_data = (string) \preg_replace([self::APOSTROPHE_WORDS . $f['u'], self::APOSTROPHE_DECADES . $f['u']], [U::APOSTROPHE, U::APOSTROPHE . '$1'], $node_data);
         // Quotes.
         $node_data = \str_replace($this->brackets_matches, $this->brackets_replacements, $node_data);
-        $node_data = \preg_replace([self::SINGLE_QUOTE_OPEN . $f['u'], self::SINGLE_QUOTE_CLOSE . $f['u'], self::DOUBLE_QUOTE_OPEN . $f['u'], self::DOUBLE_QUOTE_CLOSE . $f['u']], [$single_open, $single_close, $double_open, $double_close], $node_data);
-        // Quote catch-alls - assume left over quotes are closing - as this is often the most complicated position, thus most likely to be missed.
+        $node_data = (string) \preg_replace([self::SINGLE_QUOTE_OPEN . $f['u'], self::SINGLE_QUOTE_CLOSE . $f['u'], self::DOUBLE_QUOTE_OPEN . $f['u'], self::DOUBLE_QUOTE_CLOSE . $f['u']], [$single_open, $single_close, $double_open, $double_close], $node_data);
+        // Quote catch-all - assume left over quotes are closing - as this is often the most complicated position, thus most likely to be missed.
         $node_data = \str_replace(["'", '"'], [$single_close, $double_close], $node_data);
         // Add a thin non-breaking space between secondary and primary quotes.
         $node_data = \str_replace(["{$double_open}{$single_open}", "{$single_close}{$double_close}"], [$double_open . U::NO_BREAK_NARROW_SPACE . $single_open, $single_close . U::NO_BREAK_NARROW_SPACE . $double_close], $node_data);

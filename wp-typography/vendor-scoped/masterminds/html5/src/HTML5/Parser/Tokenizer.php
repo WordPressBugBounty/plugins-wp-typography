@@ -433,7 +433,7 @@ class Tokenizer
         // 8.1.2.3
         $this->scanner->whitespace();
         $val = $this->attributeValue();
-        if ($isValidAttribute) {
+        if ($isValidAttribute && !array_key_exists($name, $attributes)) {
             $attributes[$name] = $val;
         }
         return \true;
@@ -486,7 +486,7 @@ class Tokenizer
      */
     protected function quotedAttributeValue($quote)
     {
-        $stoplist = "\f" . $quote;
+        $stoplist = $quote;
         $val = '';
         while (\true) {
             $tokens = $this->scanner->charsUntil($stoplist . '&');
@@ -956,7 +956,7 @@ class Tokenizer
                 $this->scanner->unconsume(1);
                 return '&';
             }
-            // Hexidecimal encoding.
+            // Hexadecimal encoding.
             // X[0-9a-fA-F]+;
             // x[0-9a-fA-F]+;
             if ('x' === $tok || 'X' === $tok) {
@@ -1024,6 +1024,9 @@ class Tokenizer
      */
     protected function is_alpha($input)
     {
+        if (!is_string($input) || 1 !== strlen($input)) {
+            return \false;
+        }
         $code = ord($input);
         return $code >= 97 && $code <= 122 || $code >= 65 && $code <= 90;
     }

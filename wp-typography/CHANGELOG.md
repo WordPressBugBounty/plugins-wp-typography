@@ -1,5 +1,14 @@
 # Changes
 
+## 5.12.0 - October 27, 2026
+*   _Change_: PHP minimum version increased to 8.1.
+*   _Change_: Updated to use version 7.0.0 of the composer package `mundschenk-at/php-typography`.
+*   _Bugfix_: Caching of `PHP_Typography`, `Hyphenator`, and `Settings` instances should work again.
+*   _Bugfix_: A few development artifacts have been removed from the release package.
+
+## 5.11.0 - February 23, 2025
+*   _Bugfix_: Don't crash when a runtime requirement is not met.
+
 ## 5.10.1 - December 16, 2024
 *   _Bugfix_: A debug message intended for local use accidentally got into the build of 5.10.0.
 

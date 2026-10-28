@@ -1,8 +1,10 @@
 === wp-Typography ===
 Contributors: pputzer, kingjeffrey
-Tags: typography, hyphenation, smart quotes, formatting, widows, orphans, typogrify, quotes, prettify, small caps, diacritics
-Tested up to: 6.7
-Stable tag: 5.10.1
+Tags: typography, hyphenation, smart quotes, widows, typogrify
+Tested up to: 7.1
+Stable tag: 5.12.0
+License: GPLv2 or later
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
 Improve your web typography with: hyphenation, space control, intelligent character replacement, and CSS hooks.
 
@@ -38,7 +40,7 @@ Improve your web typography with:
 
 wp-Typography has the following requirements:
 
-* The host server must run PHP 7.4.0 or later,
+* The host server must run PHP 8.1.0 or later,
 * your installation of PHP must include the following PHP extensions (most do):
   - [mbstring](https://www.php.net/manual/en/mbstring.installation.php),
   - [DOM](https://www.php.net/manual/en/dom.installation.php), and
@@ -76,6 +78,15 @@ Remember, many more FAQs are are addressed the [wp-Typography website](https://c
 4. wp-Typography "Add CSS Hooks" settings page.
 
 == Changelog ==
+
+= 5.12.0 - October 27, 2026 =
+* _Change_: PHP minimum version increased to 8.1.
+* _Change_: Updated to use version 7.0.0 of the composer package `mundschenk-at/php-typography`.
+* _Bugfix_: Caching of `PHP_Typography`, `Hyphenator`, and `Settings` instances should work again.
+* _Bugfix_: A few development artifacts have been removed from the release package.
+
+= 5.11.0 - February 23, 2025 =
+* _Bugfix_: Don't crash when a runtime requirement is not met.
 
 = 5.10.1 - December 16, 2024 =
 * _Bugfix_: A debug message intended for local use accidentally got into the build of 5.10.0.

@@ -3,7 +3,7 @@
 /**
  *  This file is part of PHP-Typography.
  *
- *  Copyright 2014-2022 Peter Putzer.
+ *  Copyright 2014-2026 Peter Putzer.
  *  Copyright 2009-2011 KINGdesk, LLC.
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -94,6 +94,9 @@ abstract class RE
     // Inserted HTML tags.
     const ESCAPED_HTML_OPEN = '_B_E_G_I_N_H_T_M_L_';
     const ESCAPED_HTML_CLOSE = '_E_N_D_H_T_M_L_';
+    // Escaped version of the HTML tag markers.
+    const ESCAPED_ESCAPED_HTML_OPEN = '__B__E__G__I__N__H__T__M__L__';
+    const ESCAPED_ESCAPED_HTML_CLOSE = '__E__N__D__H__T__M__L__';
     /**
      * A pattern matching top-level domains.
      *
@@ -115,8 +118,9 @@ abstract class RE
             while (!$file->eof()) {
                 $line = $file->fgets();
                 if (!\is_string($line)) {
-                    break;
                     // File could not be read, let's bail.
+                    break;
+                    // @codeCoverageIgnore
                 }
                 if (\preg_match('#^[a-zA-Z0-9][a-zA-Z0-9-]*$#', $line, $matches)) {
                     $domains[] = \strtolower($matches[0]);
@@ -127,6 +131,7 @@ abstract class RE
             return \implode('|', $domains);
         } else {
             return 'ac|ad|aero|ae|af|ag|ai|al|am|an|ao|aq|arpa|ar|asia|as|at|au|aw|ax|az|ba|bb|bd|be|bf|bg|bh|biz|bi|bj|bm|bn|bo|br|bs|bt|bv|bw|by|bz|cat|ca|cc|cd|cf|cg|ch|ci|ck|cl|cm|cn|com|coop|co|cr|cu|cv|cx|cy|cz|de|dj|dk|dm|do|dz|ec|edu|ee|eg|er|es|et|eu|fi|fj|fk|fm|fo|fr|ga|gb|gd|ge|gf|gg|gh|gi|gl|gm|gn|gov|gp|gq|gr|gs|gt|gu|gw|gy|hk|hm|hn|hr|ht|hu|id|ie|il|im|info|int|in|io|iq|ir|is|it|je|jm|jobs|jo|jp|ke|kg|kh|ki|km|kn|kp|kr|kw|ky|kz|la|lb|lc|li|lk|lr|ls|lt|lu|lv|ly|ma|mc|md|me|mg|mh|mil|mk|ml|mm|mn|mobi|mo|mp|mq|mr|ms|mt|museum|mu|mv|mw|mx|my|mz|name|na|nc|net|ne|nf|ng|ni|nl|no|np|nr|nu|nz|om|org|pa|pe|pf|pg|ph|pk|pl|pm|pn|pro|pr|ps|pt|pw|py|qa|re|ro|rs|ru|rw|sa|sb|sc|sd|se|sg|sh|si|sj|sk|sl|sm|sn|so|sr|st|su|sv|sy|sz|tc|td|tel|tf|tg|th|tj|tk|tl|tm|tn|to|tp|travel|tr|tt|tv|tw|tz|ua|ug|uk|um|us|uy|uz|va|vc|ve|vg|vi|vn|vu|wf|ws|ye|yt|yu|za|zm|zw';
+            // @spellchecker:disable-line
         }
     }
     /**
@@ -154,7 +159,7 @@ abstract class RE
         return str_replace(['<', '>'], [self::ESCAPED_HTML_OPEN, self::ESCAPED_HTML_CLOSE], $tags);
     }
     /**
-     * Replace tag escape markers with < and >.
+     * Replace tag escape markers with < and > (and escaped tag escape markers with their normal equivalent).
      *
      * @param  string $tags A string containing escaped HTML markup.
      *
@@ -162,7 +167,20 @@ abstract class RE
      */
     public static function unescape_tags($tags)
     {
-        return str_replace([self::ESCAPED_HTML_OPEN, self::ESCAPED_HTML_CLOSE], ['<', '>'], $tags);
+        return str_replace([self::ESCAPED_HTML_OPEN, self::ESCAPED_HTML_CLOSE, self::ESCAPED_ESCAPED_HTML_OPEN, self::ESCAPED_ESCAPED_HTML_CLOSE], ['<', '>', self::ESCAPED_HTML_OPEN, self::ESCAPED_HTML_CLOSE], $tags);
+    }
+    /**
+     * Replaces the tag escape marker with an escaped version of itself.
+     *
+     * @since 7.0.1
+     *
+     * @param  string $content A string containing an HTML escape marker.
+     *
+     * @return string
+     */
+    public static function escape_content(string $content): string
+    {
+        return str_replace([self::ESCAPED_HTML_OPEN, self::ESCAPED_HTML_CLOSE], [self::ESCAPED_ESCAPED_HTML_OPEN, self::ESCAPED_ESCAPED_HTML_CLOSE], $content);
     }
 }
 /**

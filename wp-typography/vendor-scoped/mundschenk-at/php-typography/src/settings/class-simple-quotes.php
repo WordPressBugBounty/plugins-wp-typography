@@ -3,7 +3,7 @@
 /**
  *  This file is part of PHP-Typography.
  *
- *  Copyright 2017 Peter Putzer.
+ *  Copyright 2017-2024 Peter Putzer.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -33,20 +33,20 @@ namespace WP_Typography\Vendor\PHP_Typography\Settings;
  *
  * @since 5.0.0
  */
-final class Simple_Quotes implements Quotes
+final class Simple_Quotes extends Quotes
 {
     /**
      * Opening quote character(s).
      *
      * @var string
      */
-    private $open;
+    private string $open;
     /**
      * Closing quote character(s).
      *
      * @var string
      */
-    private $close;
+    private string $close;
     /**
      * Creates a new quotes object.
      *
@@ -63,7 +63,7 @@ final class Simple_Quotes implements Quotes
      *
      * @return string
      */
-    public function open()
+    public function open(): string
     {
         return $this->open;
     }
@@ -72,7 +72,7 @@ final class Simple_Quotes implements Quotes
      *
      * @return string
      */
-    public function close()
+    public function close(): string
     {
         return $this->close;
     }

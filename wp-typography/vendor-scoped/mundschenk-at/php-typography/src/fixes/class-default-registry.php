@@ -3,7 +3,7 @@
 /**
  *  This file is part of PHP-Typography.
  *
- *  Copyright 2017-2022 Peter Putzer.
+ *  Copyright 2017-2024 Peter Putzer.
  *
  *  This program is free software; you can redistribute it and/or modify modify
  *  it under the terms of the GNU General Public License as published by
@@ -26,10 +26,9 @@
  */
 namespace WP_Typography\Vendor\PHP_Typography\Fixes;
 
-use WP_Typography\Vendor\PHP_Typography\Settings;
+use WP_Typography\Vendor\PHP_Typography\Hyphenator\Cache;
 use WP_Typography\Vendor\PHP_Typography\Fixes\Node_Fix;
 use WP_Typography\Vendor\PHP_Typography\Fixes\Token_Fix;
-use WP_Typography\Vendor\PHP_Typography\Hyphenator\Cache;
 /**
  * A registry implementation containing the default fixes for PHP_Typography.
  *
@@ -49,7 +48,7 @@ class Default_Registry extends Registry
      * @param Cache|null $cache       Optional. A hyphenatation cache instance to use. Default null.
      * @param string[]   $css_classes Optional. An array of CSS classes to use. Defaults to null (i.e. use the predefined classes).
      */
-    public function __construct(Cache $cache = null, array $css_classes = [])
+    public function __construct(?Cache $cache = null, array $css_classes = [])
     {
         parent::__construct();
         if (empty($css_classes)) {
@@ -78,7 +77,7 @@ class Default_Registry extends Registry
         /**
          * Also register the token fixes.
          *
-         *  @var Token_Fix $fix A token fix class.
+         *  @var class-string<Token_Fix> $fix A token fix class.
          */
         foreach (self::get_default_token_fixes() as $fix => $params) {
             $arguments = [];
@@ -99,7 +98,7 @@ class Default_Registry extends Registry
      *     }
      * }
      */
-    protected static function get_default_node_fixes()
+    protected static function get_default_node_fixes(): array
     {
         return [self::CHARACTERS => [
             // Nodify anything that requires adjacent text awareness here.
@@ -144,14 +143,14 @@ class Default_Registry extends Registry
             Node_Fixes\Style_Ampersands_Fix::class => ['classes' => ['amp']],
             Node_Fixes\Style_Initial_Quotes_Fix::class => ['classes' => ['quo', 'dquo']],
             Node_Fixes\Style_Hanging_Punctuation_Fix::class => ['classes' => ['push-single', 'push-double', 'pull-single', 'pull-double']],
-        ]];
+        ], self::POST_PROCESSING => [Node_Fixes\Unicode_Remapping_Fix::class => []]];
     }
     /**
      * Returns a configuration array for the default token fixes.
      *
-     * @return array<class-string,mixed[]>
+     * @return array<class-string<Token_Fix>,mixed[]>
      */
-    protected static function get_default_token_fixes()
+    protected static function get_default_token_fixes(): array
     {
         return [Token_Fixes\Wrap_Hard_Hyphens_Fix::class => [], Token_Fixes\Smart_Dashes_Hyphen_Fix::class => [], Token_Fixes\Hyphenate_Compounds_Fix::class => ['cache' => \true], Token_Fixes\Hyphenate_Fix::class => ['cache' => \true], Token_Fixes\Wrap_URLs_Fix::class => ['cache' => \true], Token_Fixes\Wrap_Emails_Fix::class => []];
     }

@@ -3,7 +3,7 @@
 /**
  *  This file is part of PHP-Typography.
  *
- *  Copyright 2017 Peter Putzer.
+ *  Copyright 2017-2024 Peter Putzer.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ namespace WP_Typography\Vendor\PHP_Typography\Settings;
  *
  * @since 5.0.0
  */
-final class Simple_Dashes implements Dashes
+final class Simple_Dashes extends Dashes
 {
     /**
      * The dash character used for parenthetical dashes.
@@ -46,19 +46,19 @@ final class Simple_Dashes implements Dashes
      *
      * @var string
      */
-    private $parenthetical_space;
+    private string $parenthetical_space;
     /**
      * The dash character used for interval dashes.
      *
      * @var string
      */
-    private $interval_dash;
+    private string $interval_dash;
     /**
      * The space character used around interval dashes.
      *
      * @var string
      */
-    private $interval_space;
+    private string $interval_space;
     /**
      * Creates a new quotes object.
      *
@@ -79,7 +79,7 @@ final class Simple_Dashes implements Dashes
      *
      * @return string
      */
-    public function interval_dash()
+    public function interval_dash(): string
     {
         return $this->interval_dash;
     }
@@ -88,7 +88,7 @@ final class Simple_Dashes implements Dashes
      *
      * @return string
      */
-    public function interval_space()
+    public function interval_space(): string
     {
         return $this->interval_space;
     }
@@ -97,7 +97,7 @@ final class Simple_Dashes implements Dashes
      *
      * @return string
      */
-    public function parenthetical_dash()
+    public function parenthetical_dash(): string
     {
         return $this->parenthetical_dash;
     }
@@ -106,7 +106,7 @@ final class Simple_Dashes implements Dashes
      *
      * @return string
      */
-    public function parenthetical_space()
+    public function parenthetical_space(): string
     {
         return $this->parenthetical_space;
     }

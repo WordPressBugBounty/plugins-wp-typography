@@ -3,7 +3,7 @@
 /**
  *  This file is part of PHP-Typography.
  *
- *  Copyright 2017-2022 Peter Putzer.
+ *  Copyright 2017-2024 Peter Putzer.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -26,8 +26,8 @@
  */
 namespace WP_Typography\Vendor\PHP_Typography\Settings;
 
-use WP_Typography\Vendor\PHP_Typography\Settings;
 use WP_Typography\Vendor\PHP_Typography\U;
+use WP_Typography\Vendor\PHP_Typography\Exceptions\Invalid_Style_Exception;
 /**
  * A factory class for different dash styles.
  *
@@ -50,11 +50,19 @@ abstract class Dash_Style
      */
     const INTERNATIONAL_NO_HAIR_SPACES = 'internationalNoHairSpaces';
     /**
+     * Empty dash style.
+     *
+     * @since 7.0.0
+     */
+    const NONE = 'noneAtAll';
+    /**
      * Available dash styles.
+     *
+     * @since 7.0.0 Now a private constant instead of a private property.
      *
      * @var array<string,string[]>
      */
-    private static $styles = [self::TRADITIONAL_US => [self::PARENTHETICAL => U::EM_DASH, self::PARENTHETICAL_SPACE => U::THIN_SPACE, self::INTERVAL => U::EN_DASH, self::INTERVAL_SPACE => U::THIN_SPACE], self::INTERNATIONAL => [self::PARENTHETICAL => U::EN_DASH, self::PARENTHETICAL_SPACE => ' ', self::INTERVAL => U::EN_DASH, self::INTERVAL_SPACE => U::HAIR_SPACE], self::INTERNATIONAL_NO_HAIR_SPACES => [self::PARENTHETICAL => U::EN_DASH, self::PARENTHETICAL_SPACE => ' ', self::INTERVAL => U::EN_DASH, self::INTERVAL_SPACE => '']];
+    private const STYLES = [self::TRADITIONAL_US => [self::PARENTHETICAL => U::EM_DASH, self::PARENTHETICAL_SPACE => U::THIN_SPACE, self::INTERVAL => U::EN_DASH, self::INTERVAL_SPACE => U::THIN_SPACE], self::INTERNATIONAL => [self::PARENTHETICAL => U::EN_DASH, self::PARENTHETICAL_SPACE => ' ', self::INTERVAL => U::EN_DASH, self::INTERVAL_SPACE => U::HAIR_SPACE], self::INTERNATIONAL_NO_HAIR_SPACES => [self::PARENTHETICAL => U::EN_DASH, self::PARENTHETICAL_SPACE => ' ', self::INTERVAL => U::EN_DASH, self::INTERVAL_SPACE => ''], self::NONE => [self::PARENTHETICAL => '', self::PARENTHETICAL_SPACE => '', self::INTERVAL => '', self::INTERVAL_SPACE => '']];
     /**
      * Interval dash.
      *
@@ -91,18 +99,24 @@ abstract class Dash_Style
      * Creates a new Dashes object in the given style.
      *
      * @since 6.5.0 The $settings parameter has been deprecated.
+     * @since 7.0.0 Deprecated parameter $settings removed. The $style parameter
+     *              can optionally now also be a Dashes object.
      *
-     * @param string   $style    The dash style.
-     * @param Settings $settings The current settings.
+     * @param Dashes|string $style The dash style.
      *
-     * @return Dashes|null Returns null in case of an invalid $style parameter.
+     * @return Dashes
+     *
+     * @throws Invalid_Style_Exception An exception is thrown if $style is not a Dashes object nor a valid style.
      */
-    public static function get_styled_dashes($style, Settings $settings)
+    public static function get_styled_dashes($style): Dashes
     {
-        if (isset(self::$styles[$style])) {
-            return new Simple_Dashes(self::$styles[$style][self::PARENTHETICAL], self::$styles[$style][self::PARENTHETICAL_SPACE], self::$styles[$style][self::INTERVAL], self::$styles[$style][self::INTERVAL_SPACE]);
+        if ($style instanceof Dashes) {
+            return $style;
+        } elseif (isset(self::STYLES[$style])) {
+            return new Simple_Dashes(self::STYLES[$style][self::PARENTHETICAL], self::STYLES[$style][self::PARENTHETICAL_SPACE], self::STYLES[$style][self::INTERVAL], self::STYLES[$style][self::INTERVAL_SPACE]);
+        } else {
+            throw new Invalid_Style_Exception("Invalid dash style {$style}.");
         }
-        return null;
     }
 }
 /**

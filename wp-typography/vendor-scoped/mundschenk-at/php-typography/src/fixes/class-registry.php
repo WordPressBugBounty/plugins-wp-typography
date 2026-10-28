@@ -3,7 +3,7 @@
 /**
  *  This file is part of PHP-Typography.
  *
- *  Copyright 2017-2022 Peter Putzer.
+ *  Copyright 2017-2024 Peter Putzer.
  *
  *  This program is free software; you can redistribute it and/or modify modify
  *  it under the terms of the GNU General Public License as published by
@@ -30,7 +30,6 @@ use WP_Typography\Vendor\PHP_Typography\Settings;
 use WP_Typography\Vendor\PHP_Typography\Hyphenator\Cache;
 use WP_Typography\Vendor\PHP_Typography\Fixes\Node_Fix;
 use WP_Typography\Vendor\PHP_Typography\Fixes\Token_Fix;
-use WP_Typography\Vendor\PHP_Typography\Fixes\Token_Fixes\Hyphenate_Fix;
 /**
  * Manages the fixes used by PHP_Typography.
  *
@@ -40,18 +39,20 @@ use WP_Typography\Vendor\PHP_Typography\Fixes\Token_Fixes\Hyphenate_Fix;
  */
 class Registry
 {
+    const PRE_PROCESSING = 01;
     const CHARACTERS = 10;
     const SPACING_PRE_WORDS = 20;
     const PROCESS_WORDS = 30;
     const SPACING_POST_WORDS = 40;
     const HTML_INSERTION = 50;
-    const GROUPS = [self::CHARACTERS, self::SPACING_PRE_WORDS, self::PROCESS_WORDS, self::SPACING_POST_WORDS, self::HTML_INSERTION];
+    const POST_PROCESSING = 99;
+    const GROUPS = [self::PRE_PROCESSING, self::CHARACTERS, self::SPACING_PRE_WORDS, self::PROCESS_WORDS, self::SPACING_POST_WORDS, self::HTML_INSERTION, self::POST_PROCESSING];
     /**
      * An array of Node_Fix implementations indexed by groups.
      *
      * @var array<int,Node_Fix[]>
      */
-    private $node_fixes = [self::CHARACTERS => [], self::SPACING_PRE_WORDS => [], self::PROCESS_WORDS => [], self::SPACING_POST_WORDS => [], self::HTML_INSERTION => []];
+    private $node_fixes = [self::PRE_PROCESSING => [], self::CHARACTERS => [], self::SPACING_PRE_WORDS => [], self::PROCESS_WORDS => [], self::SPACING_POST_WORDS => [], self::HTML_INSERTION => [], self::POST_PROCESSING => []];
     /**
      * The token fix registry.
      *
@@ -72,7 +73,7 @@ class Registry
      *
      * @return Node_Fix[][]
      */
-    public function get_node_fixes()
+    public function get_node_fixes(): array
     {
         return $this->node_fixes;
     }

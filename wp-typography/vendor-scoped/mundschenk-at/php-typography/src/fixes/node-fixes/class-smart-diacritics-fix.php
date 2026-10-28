@@ -3,7 +3,7 @@
 /**
  *  This file is part of PHP-Typography.
  *
- *  Copyright 2017-2019 Peter Putzer.
+ *  Copyright 2017-2024 Peter Putzer.
  *
  *  This program is free software; you can redistribute it and/or modify modify
  *  it under the terms of the GNU General Public License as published by
@@ -27,7 +27,6 @@
 namespace WP_Typography\Vendor\PHP_Typography\Fixes\Node_Fixes;
 
 use WP_Typography\Vendor\PHP_Typography\Settings;
-use WP_Typography\Vendor\PHP_Typography\DOM;
 /**
  * Applies smart diacritics (if enabled).
  *
@@ -40,24 +39,29 @@ class Smart_Diacritics_Fix extends Abstract_Node_Fix
     /**
      * Apply the fix to a given textnode.
      *
-     * @param \DOMText $textnode Required.
-     * @param Settings $settings Required.
-     * @param bool     $is_title Optional. Default false.
+     * @since 7.0.0 All parameters are now required.
+     *
+     * @param \DOMText $textnode The DOM node.
+     * @param Settings $settings The settings to apply.
+     * @param bool     $is_title Indicates if the processed tokens occur in a title/heading context.
+     *
+     * @return void
      */
-    public function apply(\DOMText $textnode, Settings $settings, $is_title = \false)
+    public function apply(\DOMText $textnode, Settings $settings, $is_title)
     {
-        if (empty($settings[Settings::SMART_DIACRITICS])) {
+        if (empty($settings->smart_diacritics) || empty($settings->diacritic_combined)) {
             return;
             // abort.
         }
-        if (!empty($settings[Settings::DIACRITIC_REPLACEMENT_DATA]) && !empty($settings[Settings::DIACRITIC_REPLACEMENT_DATA]['patterns']) && !empty($settings[Settings::DIACRITIC_REPLACEMENT_DATA]['replacements'])) {
+        // FIXME: Add proper initialization and move condition upwards.
+        if (!empty($settings->diacritic_combined['patterns']) && !empty($settings->diacritic_combined['replacements'])) {
             // Uses "word" => "replacement" pairs from an array to make fast preg_* replacements.
-            $replacements = $settings[Settings::DIACRITIC_REPLACEMENT_DATA]['replacements'];
-            $textnode->data = \preg_replace_callback($settings[Settings::DIACRITIC_REPLACEMENT_DATA]['patterns'], function ($match) use ($replacements) {
-                if (isset($replacements[$match[0]])) {
-                    return $replacements[$match[0]];
+            $replacements = $settings->diacritic_combined['replacements'];
+            $textnode->data = (string) \preg_replace_callback($settings->diacritic_combined['patterns'], function ($matching) use ($replacements) {
+                if (isset($replacements[$matching[0]])) {
+                    return $replacements[$matching[0]];
                 } else {
-                    return $match[0];
+                    return $matching[0];
                 }
             }, $textnode->data);
         }

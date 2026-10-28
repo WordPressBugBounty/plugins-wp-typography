@@ -3,7 +3,7 @@
 /**
  *  This file is part of PHP-Typography.
  *
- *  Copyright 2014-2019 Peter Putzer.
+ *  Copyright 2014-2026 Peter Putzer.
  *  Copyright 2009-2011 KINGdesk, LLC.
  *
  *  This program is free software; you can redistribute it and/or modify modify
@@ -27,7 +27,6 @@
  */
 namespace WP_Typography\Vendor\PHP_Typography\Fixes\Node_Fixes;
 
-use WP_Typography\Vendor\PHP_Typography\DOM;
 use WP_Typography\Vendor\PHP_Typography\RE;
 use WP_Typography\Vendor\PHP_Typography\Settings;
 use WP_Typography\Vendor\PHP_Typography\U;
@@ -52,21 +51,21 @@ class Smart_Dashes_Fix extends Abstract_Node_Fix
     // Date handling.
     const DATE_YYYY_MM_DD = '/
 		(
-			(?<=\s|\A|' . U::NO_BREAK_SPACE . ')
+			(?<=\s|\A|[' . U::NO_BREAK_SPACE . '])
 			[12][0-9]{3}
 		)
 		[\-' . U::EN_DASH . ']
 		(
 			(?:[0][1-9]|[1][0-2])
 		)
-		[\-' . U::EN_DASH . "]\n\t\t\t(\n\t\t\t\t(?:[0][1-9]|[12][0-9]|[3][0-1])\n\t\t\t\t(?=\\s|\\Z|\\)|\\]|\\.|\\,|\\?|\\;|\\:|\\'|\"|\\!|" . U::NO_BREAK_SPACE . ')
+		[\-' . U::EN_DASH . "]\n\t\t\t(\n\t\t\t\t(?:[0][1-9]|[12][0-9]|[3][0-1])\n\t\t\t\t(?=\\s|\\Z|\\)|\\]|\\.|\\,|\\?|\\;|\\:|\\'|\"|\\!|[" . U::NO_BREAK_SPACE . '])
 		)
 	/xu';
     const DATE_MM_DD_YYYY = '/
 		(?:
 			(?:
 				(
-					(?<=\s|\A|' . U::NO_BREAK_SPACE . ')
+					(?<=\s|\A|[' . U::NO_BREAK_SPACE . '])
 					(?:[0]?[1-9]|[1][0-2])
 				)
 				[\-' . U::EN_DASH . ']
@@ -77,7 +76,7 @@ class Smart_Dashes_Fix extends Abstract_Node_Fix
 			|
 			(?:
 				(
-					(?<=\s|\A|' . U::NO_BREAK_SPACE . ')
+					(?<=\s|\A|[' . U::NO_BREAK_SPACE . '])
 					(?:[0]?[1-9]|[12][0-9]|[3][0-1])
 				)
 				[\-' . U::EN_DASH . ']
@@ -86,41 +85,45 @@ class Smart_Dashes_Fix extends Abstract_Node_Fix
 				)
 			)
 		)
-		[\-' . U::EN_DASH . "]\n\t\t(\n\t\t\t[12][0-9]{3}\n\t\t\t(?=\\s|\\Z|\\)|\\]|\\.|\\,|\\?|\\;|\\:|\\'|\"|\\!|" . U::NO_BREAK_SPACE . ')
+		[\-' . U::EN_DASH . "]\n\t\t(\n\t\t\t[12][0-9]{3}\n\t\t\t(?=\\s|\\Z|\\)|\\]|\\.|\\,|\\?|\\;|\\:|\\'|\"|\\!|[" . U::NO_BREAK_SPACE . '])
 		)
 	/xu';
     const DATE_YYYY_MM = '/
 		(
-			(?<=\s|\A|' . U::NO_BREAK_SPACE . ')
+			(?<=\s|\A|[' . U::NO_BREAK_SPACE . '])
 			[12][0-9]{3}
 		)
-		[\-' . U::EN_DASH . "]\n\t\t(\n\t\t\t(?:\n\t\t\t\t(?:[0][1-9]|[1][0-2])\n\t\t\t\t|\n\t\t\t\t(?:[0][0-9][1-9]|[1-2][0-9]{2}|[3][0-5][0-9]|[3][6][0-6])\n\t\t\t)\n\t\t\t(?=\\s|\\Z|\\)|\\]|\\.|\\,|\\?|\\;|\\:|\\'|\"|\\!|" . U::NO_BREAK_SPACE . ')
+		[\-' . U::EN_DASH . "]\n\t\t(\n\t\t\t(?:\n\t\t\t\t(?:[0][1-9]|[1][0-2])\n\t\t\t\t|\n\t\t\t\t(?:[0][0-9][1-9]|[1-2][0-9]{2}|[3][0-5][0-9]|[3][6][0-6])\n\t\t\t)\n\t\t\t(?=\\s|\\Z|\\)|\\]|\\.|\\,|\\?|\\;|\\:|\\'|\"|\\!|[" . U::NO_BREAK_SPACE . '])
 		)
 	/xu';
     /**
      * Apply the fix to a given textnode.
      *
-     * @param \DOMText $textnode Required.
-     * @param Settings $settings Required.
-     * @param bool     $is_title Optional. Default false.
+     * @since 7.0.0 All parameters are now required.
+     *
+     * @param \DOMText $textnode The DOM node.
+     * @param Settings $settings The settings to apply.
+     * @param bool     $is_title Indicates if the processed tokens occur in a title/heading context.
+     *
+     * @return void
      */
-    public function apply(\DOMText $textnode, Settings $settings, $is_title = \false)
+    public function apply(\DOMText $textnode, Settings $settings, $is_title)
     {
-        if (empty($settings[Settings::SMART_DASHES])) {
+        if (empty($settings->smart_dashes)) {
             return;
         }
         // Various special characters and regular expressions.
-        $s = $settings->dash_style();
+        $s = $settings->dash_style;
         // Cache textnode content.
         $node_data = $textnode->data;
         $node_data = \str_replace('---', U::EM_DASH, $node_data);
-        $node_data = \preg_replace(self::PARENTHETICAL_DOUBLE_DASH, "\$1{$s->parenthetical_dash()}\$2", $node_data);
+        $node_data = (string) \preg_replace(self::PARENTHETICAL_DOUBLE_DASH, "\$1{$s->parenthetical_dash()}\$2", $node_data);
         $node_data = \str_replace('--', U::EN_DASH, $node_data);
-        $node_data = \preg_replace([self::PARENTHETICAL_SINGLE_DASH, self::EN_DASH_WORDS, self::EN_DASH_NUMBERS, self::EN_DASH_PHONE_NUMBERS, self::NO_BREAK_HYPHEN], ["\$1{$s->parenthetical_dash()}\$2", '$1' . U::EN_DASH . '$2', "\$1{$s->interval_dash()}\$3", '$1' . U::NO_BREAK_HYPHEN . '$2', '$1' . U::NO_BREAK_HYPHEN . '$2'], $node_data);
+        $node_data = (string) \preg_replace([self::PARENTHETICAL_SINGLE_DASH, self::EN_DASH_WORDS, self::EN_DASH_NUMBERS, self::EN_DASH_PHONE_NUMBERS, self::NO_BREAK_HYPHEN], ["\$1{$s->parenthetical_dash()}\$2", '$1' . U::EN_DASH . '$2', "\$1{$s->interval_dash()}\$3", '$1' . U::NO_BREAK_HYPHEN . '$2', '$1' . U::NO_BREAK_HYPHEN . '$2'], $node_data);
         // Revert messed-up punycode.
         $node_data = \str_replace('xn' . U::EN_DASH, 'xn--', $node_data);
         // Revert dates back to original formats.
-        $node_data = \preg_replace([
+        $node_data = (string) \preg_replace([
             self::DATE_YYYY_MM_DD,
             // YYYY-MM-DD.
             self::DATE_MM_DD_YYYY,

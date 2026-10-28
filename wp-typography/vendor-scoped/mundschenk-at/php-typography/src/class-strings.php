@@ -3,7 +3,7 @@
 /**
  *  This file is part of PHP-Typography.
  *
- *  Copyright 2014-2022 Peter Putzer.
+ *  Copyright 2014-2024 Peter Putzer.
  *  Copyright 2009-2011 KINGdesk, LLC.
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -27,10 +27,13 @@
  */
 namespace WP_Typography\Vendor\PHP_Typography;
 
+use WP_Typography\Vendor\PHP_Typography\Exceptions\Invalid_Encoding_Exception;
 /**
  * A utility class to handle fast and save string function access.
  *
  * @since 4.2.0
+ * @since 7.0.0 The deprecated static methods `mb_str_split`, and `uchr` have been removed.
+ *              The now unused static method `maybe_split_parameters` has also been removed.
  *
  * @phpstan-type String_Functions array{
  *         'strlen'     : callable,
@@ -76,7 +79,12 @@ abstract class Strings
      * Retrieves str* functions.
      *
      * @param  string $str A string to detect the encoding from.
-     * @return String_Functions|array{}
+     *
+     * @return array
+     *
+     * @throws Invalid_Encoding_Exception Throws an exception if the string is not encoded in ASCII or UTF-8.
+     *
+     * @phpstan-return String_Functions
      */
     public static function functions($str)
     {
@@ -85,77 +93,15 @@ abstract class Strings
                 return self::STRING_FUNCTIONS[$encoding];
             }
         }
-        return [];
-    }
-    /**
-     * Multibyte-safe str_split function. Unlike regular str_split, behavior for
-     * `$split_length` < 1 is undefined and may or may not result in an error
-     * being raised.
-     *
-     * @deprecated 6.7.0
-     *
-     * @param string     $string       The input string.
-     * @param int<1,max> $split_length Optional. Maximum length of the chunk. Default 1.
-     *
-     * @return string[]                An array of $split_length character chunks.
-     */
-    public static function mb_str_split($string, $split_length = 1)
-    {
-        // Checking here is not optimal, the check should be made on instantiation
-        // when the class is refactored.
-        if (\function_exists('mb_str_split')) {
-            // phpcs:ignore PHPCompatibility.FunctionUse.NewFunctions.mb_str_splitFound, WordPress.PHP.DisallowShortTernary -- Ensure array type.
-            return \mb_str_split($string, $split_length, 'UTF-8') ?: [];
-        }
-        // We can safely assume an array here, as long as $string convertible to a string.
-        return \preg_split("/(.{{$split_length}})/us", $string, -1, \PREG_SPLIT_NO_EMPTY | \PREG_SPLIT_DELIM_CAPTURE) ?: [];
-        // phpcs:ignore WordPress.PHP.DisallowShortTernary -- Ensure array type.
-    }
-    /**
-     * Converts decimal value to unicode character.
-     *
-     * @deprecated 6.7.0
-     *
-     * @param int|string|array<string|int> $codes Decimal value(s) coresponding to unicode character(s).
-     *
-     * @return string Unicode character(s).
-     */
-    public static function uchr($codes)
-    {
-        // Single character code.
-        if (\is_scalar($codes)) {
-            $codes = \func_get_args();
-            // phpcs:ignore PHPCompatibility.FunctionUse.ArgumentFunctionsReportCurrentValue.NeedsInspection
-        }
-        // Deal with an array of character codes.
-        $json = '"';
-        foreach ($codes as $code) {
-            $json .= \sprintf('\u%04x', $code);
-        }
-        $json .= '"';
-        return \json_decode($json);
-    }
-    /**
-     * If necessary, split the passed parameters string into an array.
-     *
-     * @param  string[]|string $params Parameters.
-     *
-     * @return string[]
-     */
-    public static function maybe_split_parameters($params)
-    {
-        if (!\is_array($params)) {
-            // We can safely assume an array here, as long as $params convertible to a string.
-            $params = \preg_split(self::RE_PARAMETER_SPLITTING, $params, -1, \PREG_SPLIT_NO_EMPTY) ?: [];
-            // phpcs:ignore WordPress.PHP.DisallowShortTernary -- Ensure array type in case of error.
-        }
-        return $params;
+        throw new Invalid_Encoding_Exception("String '{$str}' uses neither ASCII nor UTF-8 encoding.");
     }
 }
 /**
  * A utility class to handle fast and save string function access.
  *
  * @since 4.2.0
+ * @since 7.0.0 The deprecated static methods `mb_str_split`, and `uchr` have been removed.
+ *              The now unused static method `maybe_split_parameters` has also been removed.
  *
  * @phpstan-type String_Functions array{
  *         'strlen'     : callable,

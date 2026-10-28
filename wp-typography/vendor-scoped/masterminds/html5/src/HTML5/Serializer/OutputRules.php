@@ -15,9 +15,6 @@ use WP_Typography\Vendor\Masterminds\HTML5\Elements;
  */
 class OutputRules implements RulesInterface
 {
-    /**
-     * Defined in http://www.w3.org/TR/html51/infrastructure.html#html-namespace-0.
-     */
     const NAMESPACE_HTML = 'http://www.w3.org/1999/xhtml';
     const NAMESPACE_MATHML = 'http://www.w3.org/1998/Math/MathML';
     const NAMESPACE_SVG = 'http://www.w3.org/2000/svg';
@@ -33,12 +30,6 @@ class OutputRules implements RulesInterface
     const IM_IN_HTML = 1;
     const IM_IN_SVG = 2;
     const IM_IN_MATHML = 3;
-    /**
-     * Used as cache to detect if is available ENT_HTML5.
-     *
-     * @var bool
-     */
-    private $hasHTML5 = \false;
     protected $traverser;
     protected $encode = \false;
     protected $out;
@@ -65,7 +56,6 @@ class OutputRules implements RulesInterface
         }
         $this->outputMode = static::IM_IN_HTML;
         $this->out = $output;
-        $this->hasHTML5 = defined('ENT_HTML5');
     }
     public function addRule(array $rule)
     {
@@ -96,6 +86,9 @@ class OutputRules implements RulesInterface
         $this->wr(static::DOCTYPE);
         $this->nl();
     }
+    /**
+     * @param \DOMElement $ele
+     */
     public function element($ele)
     {
         $name = $ele->tagName;
@@ -114,6 +107,8 @@ class OutputRules implements RulesInterface
             $this->outputMode = static::IM_IN_MATHML;
         }
         $this->openTag($ele);
+        // The tag is already self-closed (`<svg />` or `<math />`) in `openTag` if there are no child nodes.
+        $handledAsVoidTag = $this->outputMode !== static::IM_IN_HTML && !$ele->hasChildNodes();
         if (Elements::isA($name, Elements::TEXT_RAW)) {
             foreach ($ele->childNodes as $child) {
                 if ($child instanceof \DOMCharacterData) {
@@ -133,7 +128,7 @@ class OutputRules implements RulesInterface
             }
         }
         // If not unary, add a closing tag.
-        if (!Elements::isA($name, Elements::VOID_TAG)) {
+        if (!$handledAsVoidTag && !Elements::isA($name, Elements::VOID_TAG)) {
             $this->closeTag($ele);
         }
     }
@@ -162,6 +157,19 @@ class OutputRules implements RulesInterface
         // $this->wr('<!--')->wr($ele->data)->wr('-->');
         $this->wr($ele->ownerDocument->saveXML($ele));
     }
+    /**
+     * Write an entity reference node.
+     *
+     * Such a node carries the entity name only: its nodeValue is null and its
+     * textContent is empty, so it cannot go through text(). saveXML() gives
+     * back the reference as it was written, which is what DOMDocument does.
+     *
+     * @param \DOMEntityReference $ele The entity reference to write.
+     */
+    public function entityReference($ele)
+    {
+        $this->wr($ele->ownerDocument->saveXML($ele));
+    }
     public function processorInstruction($ele)
     {
         $this->wr('<?')->wr($ele->target)->wr(' ')->wr($ele->data)->wr('?>');
@@ -178,7 +186,7 @@ class OutputRules implements RulesInterface
         }
         foreach ($this->xpath->query('namespace::*[not(.=../../namespace::*)]', $ele) as $nsNode) {
             if (!in_array($nsNode->nodeValue, $this->implicitNamespaces)) {
-                $this->wr(' ')->wr($nsNode->nodeName)->wr('="')->wr($nsNode->nodeValue)->wr('"');
+                $this->wr(' ')->wr($nsNode->nodeName)->wr('="')->wr($this->enc((string) $nsNode->nodeValue, \true))->wr('"');
             }
         }
     }
@@ -301,7 +309,7 @@ class OutputRules implements RulesInterface
      */
     protected function wr($text)
     {
-        fwrite($this->out, $text);
+        fwrite($this->out, (string) $text);
         return $this;
     }
     /**
@@ -332,12 +340,8 @@ class OutputRules implements RulesInterface
      *      This includes such characters as +.# and many other common ones. By default
      *      encoding here will just escape &'<>".
      *
-     *      Note, PHP 5.4+ has better html5 encoding.
-     *
-     * @todo Use the Entities class in php 5.3 to have html5 entities.
-     *
      * @param string $text      Text to encode.
-     * @param bool   $attribute True if we are encoding an attrubute, false otherwise.
+     * @param bool   $attribute True if we are encoding an attribute, false otherwise.
      *
      * @return string The encoded text.
      */
@@ -347,13 +351,7 @@ class OutputRules implements RulesInterface
         if (!$this->encode) {
             return $this->escape($text, $attribute);
         }
-        // If we are in PHP 5.4+ we can use the native html5 entity functionality to
-        // convert the named character references.
-        if ($this->hasHTML5) {
-            return htmlentities($text, \ENT_HTML5 | \ENT_SUBSTITUTE | \ENT_QUOTES, 'UTF-8', \false);
-        } else {
-            return strtr($text, HTML5Entities::$map);
-        }
+        return htmlentities($text, \ENT_HTML5 | \ENT_SUBSTITUTE | \ENT_QUOTES, 'UTF-8', \false);
     }
     /**
      * Escape test.

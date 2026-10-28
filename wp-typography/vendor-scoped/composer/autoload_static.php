@@ -10,22 +10,22 @@ use Composer\AutoloadWPTypography\ClassLoader as ClassLoaderWPTypography;
 class ComposerStaticInitWPTypography
 {
     public static $prefixLengthsPsr4 = array (
-        'W' => 
+        'W' =>
         array (
             'WP_Typography\\Vendor\\Masterminds\\' => 33,
             'WP_Typography\\Vendor\\Dice\\' => 26,
         ),
-        'D' => 
+        'D' =>
         array (
         ),
     );
 
     public static $prefixDirsPsr4 = array (
-        'WP_Typography\\Vendor\\Masterminds\\' => 
+        'WP_Typography\\Vendor\\Masterminds\\' =>
         array (
             0 => __DIR__ . '/..' . '/masterminds/html5/src',
         ),
-        'WP_Typography\\Vendor\\Dice\\' => 
+        'WP_Typography\\Vendor\\Dice\\' =>
         array (
             0 => __DIR__ . '/..' . '/level-2/dice',
         ),
@@ -81,7 +81,6 @@ class ComposerStaticInitWPTypography
         'WP_Typography\\Vendor\\Masterminds\\HTML5\\Parser\\Tokenizer' => __DIR__ . '/..' . '/masterminds/html5/src/HTML5/Parser/Tokenizer.php',
         'WP_Typography\\Vendor\\Masterminds\\HTML5\\Parser\\TreeBuildingRules' => __DIR__ . '/..' . '/masterminds/html5/src/HTML5/Parser/TreeBuildingRules.php',
         'WP_Typography\\Vendor\\Masterminds\\HTML5\\Parser\\UTF8Utils' => __DIR__ . '/..' . '/masterminds/html5/src/HTML5/Parser/UTF8Utils.php',
-        'WP_Typography\\Vendor\\Masterminds\\HTML5\\Serializer\\HTML5Entities' => __DIR__ . '/..' . '/masterminds/html5/src/HTML5/Serializer/HTML5Entities.php',
         'WP_Typography\\Vendor\\Masterminds\\HTML5\\Serializer\\OutputRules' => __DIR__ . '/..' . '/masterminds/html5/src/HTML5/Serializer/OutputRules.php',
         'WP_Typography\\Vendor\\Masterminds\\HTML5\\Serializer\\RulesInterface' => __DIR__ . '/..' . '/masterminds/html5/src/HTML5/Serializer/RulesInterface.php',
         'WP_Typography\\Vendor\\Masterminds\\HTML5\\Serializer\\Traverser' => __DIR__ . '/..' . '/masterminds/html5/src/HTML5/Serializer/Traverser.php',
@@ -105,6 +104,12 @@ class ComposerStaticInitWPTypography
         'WP_Typography\\Vendor\\Mundschenk\\UI\\Controls\\Textarea' => __DIR__ . '/..' . '/mundschenk-at/wp-settings-ui/src/ui/controls/class-textarea.php',
         'WP_Typography\\Vendor\\Mundschenk\\WP_Requirements' => __DIR__ . '/..' . '/mundschenk-at/check-wp-requirements/src/class-wp-requirements.php',
         'WP_Typography\\Vendor\\PHP_Typography\\DOM' => __DIR__ . '/..' . '/mundschenk-at/php-typography/src/class-dom.php',
+        'WP_Typography\\Vendor\\PHP_Typography\\Exceptions\\Invalid_Encoding_Exception' => __DIR__ . '/..' . '/mundschenk-at/php-typography/src/exceptions/class-invalid-encoding-exception.php',
+        'WP_Typography\\Vendor\\PHP_Typography\\Exceptions\\Invalid_File_Exception' => __DIR__ . '/..' . '/mundschenk-at/php-typography/src/exceptions/class-invalid-file-exception.php',
+        'WP_Typography\\Vendor\\PHP_Typography\\Exceptions\\Invalid_Hyphenation_Pattern_File_Exception' => __DIR__ . '/..' . '/mundschenk-at/php-typography/src/exceptions/class-invalid-hyphenation-pattern-file-exception.php',
+        'WP_Typography\\Vendor\\PHP_Typography\\Exceptions\\Invalid_JSON_Exception' => __DIR__ . '/..' . '/mundschenk-at/php-typography/src/exceptions/class-invalid-json-exception.php',
+        'WP_Typography\\Vendor\\PHP_Typography\\Exceptions\\Invalid_Path_Exception' => __DIR__ . '/..' . '/mundschenk-at/php-typography/src/exceptions/class-invalid-path-exception.php',
+        'WP_Typography\\Vendor\\PHP_Typography\\Exceptions\\Invalid_Style_Exception' => __DIR__ . '/..' . '/mundschenk-at/php-typography/src/exceptions/class-invalid-style-exception.php',
         'WP_Typography\\Vendor\\PHP_Typography\\Fixes\\Default_Registry' => __DIR__ . '/..' . '/mundschenk-at/php-typography/src/fixes/class-default-registry.php',
         'WP_Typography\\Vendor\\PHP_Typography\\Fixes\\Node_Fix' => __DIR__ . '/..' . '/mundschenk-at/php-typography/src/fixes/class-node-fix.php',
         'WP_Typography\\Vendor\\PHP_Typography\\Fixes\\Node_Fixes\\Abstract_Node_Fix' => __DIR__ . '/..' . '/mundschenk-at/php-typography/src/fixes/node-fixes/class-abstract-node-fix.php',
@@ -133,6 +138,7 @@ class ComposerStaticInitWPTypography
         'WP_Typography\\Vendor\\PHP_Typography\\Fixes\\Node_Fixes\\Style_Hanging_Punctuation_Fix' => __DIR__ . '/..' . '/mundschenk-at/php-typography/src/fixes/node-fixes/class-style-hanging-punctuation-fix.php',
         'WP_Typography\\Vendor\\PHP_Typography\\Fixes\\Node_Fixes\\Style_Initial_Quotes_Fix' => __DIR__ . '/..' . '/mundschenk-at/php-typography/src/fixes/node-fixes/class-style-initial-quotes-fix.php',
         'WP_Typography\\Vendor\\PHP_Typography\\Fixes\\Node_Fixes\\Style_Numbers_Fix' => __DIR__ . '/..' . '/mundschenk-at/php-typography/src/fixes/node-fixes/class-style-numbers-fix.php',
+        'WP_Typography\\Vendor\\PHP_Typography\\Fixes\\Node_Fixes\\Unicode_Remapping_Fix' => __DIR__ . '/..' . '/mundschenk-at/php-typography/src/fixes/node-fixes/class-unicode-remapping-fix.php',
         'WP_Typography\\Vendor\\PHP_Typography\\Fixes\\Node_Fixes\\Unit_Spacing_Fix' => __DIR__ . '/..' . '/mundschenk-at/php-typography/src/fixes/node-fixes/class-unit-spacing-fix.php',
         'WP_Typography\\Vendor\\PHP_Typography\\Fixes\\Registry' => __DIR__ . '/..' . '/mundschenk-at/php-typography/src/fixes/class-registry.php',
         'WP_Typography\\Vendor\\PHP_Typography\\Fixes\\Token_Fix' => __DIR__ . '/..' . '/mundschenk-at/php-typography/src/fixes/class-token-fix.php',

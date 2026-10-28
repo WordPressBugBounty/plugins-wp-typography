@@ -3,8 +3,7 @@
 /**
  *  This file is part of PHP-Typography.
  *
- *  Copyright 2014-2022 Peter Putzer.
- *  Copyright 2012-2013 Marie Hogebrandt.
+ *  Copyright 2014-2024 Peter Putzer.
  *  Copyright 2009-2011 KINGdesk, LLC.
  *
  *  This program is free software; you can redistribute it and/or modify
@@ -30,10 +29,11 @@ namespace WP_Typography\Vendor\PHP_Typography;
 
 use WP_Typography\Vendor\PHP_Typography\Text_Parser\Token;
 /**
- * A class to parse plain text (such as the data of DOMText).
+ * A class to parse plain text (such as the data of DOMText). If multibyte characters are passed,
+ * they must be encoded as UTF-8.
  *
- * Parse_Text assumes no HTML markup in the text (except for special html characters like &gt;).
- * If multibyte characters are passed, they must be encoded as UTF-8.
+ * @since 7.0.0 The `load`, `reload`, and `clear` methods have been removed in favor creating new parser
+ *              objects for each text fragment. The method `unload` has been replaced with `get_text`.
  */
 class Text_Parser
 {
@@ -75,7 +75,7 @@ class Text_Parser
 					;
 				)
 				|
-				(?:										# hexidecimal matches
+				(?:										# hexadecimal matches
 					&\#x
 					(?: 000[9ad]|0020|00a0|1361|1680|200[0-9a]|202f|205f|3000 )
 					;
@@ -91,7 +91,7 @@ class Text_Parser
     private const SPACE = '(?:\s|' . self::HTML_SPACING . ')+';
     // required modifiers: x (multiline pattern) i (case insensitive) $utf8.
     /**
-     * Find punctuation and symbols before words (to capture preceeding delimiating characters like hyphens or underscores)
+     * Find punctuation and symbols before words (to capture preceding delimiting characters like hyphens or underscores)
      *
      * @see http://www.unicode.org/charts/PDF/U2000.pdf
      *
@@ -109,7 +109,7 @@ class Text_Parser
 			(?:
 				(?:										# alpha matches
 					&
-					(?:quot|amp|frasl|lt|gt|iexcl|cent|pound|curren|yen|brvbar|sect|uml|pound|ordf|laquo|not|reg|macr|deg|plusmn|sup2|sup3|acute|micro|para|middot|cedil|sup1|ordm|raquo|frac14|frac12|frac34|iquest|times|divide|circ|tilde|thetasym|upsih|piv|ndash|mdash|lsquo|rsquo|sbquo|ldquo|rdquo|bdquo|dagger|Dagger|bull|hellip|permil|prime|Prime|lsaquo|rsaquo|oline|frasl|euro|trade|alefsym|larr|uarr|rarr|darr|harr|crarr|lArr|uArr|rArr|dArr|hArr|forall|part|exist|emptyn|abla|isin|notin|ni|prod|sum|minus|lowast|radic|prop|infin|ang|and|orc|ap|cup|int|there4|simc|ong|asymp|ne|equiv|le|ge|sub|supn|sub|sube|supe|oplus|otimes|perp|sdot|lceil|rceil|lfloor|rfloor|lang|rang|loz|spades|clubs|hearts|diams)
+					(?:quot|amp|frasl|lt|gt|iexcl|cent|pound|curren|yen|brvbar|sect|uml|pound|ordf|laquo|not|reg|macr|deg|plusmn|sup2|sup3|acute|micro|para|middot|cedil|sup1|ordm|raquo|frac14|frac12|frac34|iquest|times|divide|circ|tilde|thetasym|upsih|piv|ndash|mdash|lsquo|rsquo|sbquo|ldquo|rdquo|bdquo|dagger|Dagger|bull|hellip|permil|prime|Prime|lsaquo|rsaquo|oline|frasl|euro|trade|alefsym|larr|uarr|rarr|darr|harr|crarr|lArr|uArr|rArr|dArr|hArr|forall|part|exist|emptyn|abla|isin|notin|ni|prod|sum|minus|lowast|radic|prop|infin|ang|and|orc|ap|cup|int|there4|simc|ong|asymp|ne|equiv|le|ge|sub|supn|sub|sube|supe|oplus|otimes|perp|sdot|lceil|rceil|lfloor|rfloor|lang|rang|loz|spades|clubs|hearts|diams) # spellchecker:disable-line
 					;
 				)
 				|
@@ -119,7 +119,7 @@ class Text_Parser
 					;
 				)
 				|
-				(?:										# hexidecimal matches
+				(?:										# hexadecimal matches
 					&\#x
 					(?: 002[1-9a-cef]|003[a-cef]|0040|005[b-e]|0060|007[b-e]|00a[1-9a-cef]|00b[0-9a-f]|00d7|00f7|02c6|02dc|03d[126]|201[3-9a-f]|202[0-7]|20[34][0-9a-f]|205[0-9a-e]|206[1-4]|20[a-c][0-9a-f]|21[0-4][0-9a-f]|219[0-9a-f]|2[23][0-9a-f][0-9a-f]|25[a-f][0-9a-f]|23[0-9a-f][0-9a-f]|2e[0-7][0-9a-f] )
 					;
@@ -162,7 +162,7 @@ class Text_Parser
 				;
 			)
 			|
-			(?:												# hexidecimal matches
+			(?:												# hexadecimal matches
 				&\#x
 				(?: 002d|005f|00ad|200[b-d]|201[0-2] )
 				;
@@ -194,7 +194,7 @@ class Text_Parser
 				;
 			)
 			|
-			(?:												# hexidecimal matches
+			(?:												# hexadecimal matches
 				(?:
 					&\#x00
 					(?: 3[1-9]|4[1-9a-f]|5[0-9a]|6[1-9a-f]|7[0-9a]|c[0-9a-f]|d[0-689]|e[0-9a-f]|f[0-689a-f] )
@@ -253,52 +253,30 @@ class Text_Parser
     private const RE_PUNCTUATION = '/\A' . self::PUNCTUATION . '\Z/Ssxiu';
     private const RE_WORD = '/\A' . self::WORD . '\Z/Sxu';
     private const RE_HTML_LETTER_CONNECTORS = '/' . self::HTML_LETTER_CONNECTORS . '|[0-9\-_&#;\/]/Sxu';
-    private const RE_MAX_STRING_LENGTH = '/\w{500}/Ss';
     /**
      * The current strtoupper function to use (either 'strtoupper' or 'mb_strtoupper').
      *
      * @var callable
      */
-    private $current_strtoupper = 'strtoupper';
+    private $current_strtoupper;
     /**
      * The tokenized text.
      *
      * @var Token[] $text Numerically indexed tokens.
      */
-    private $text = [];
+    private array $text = [];
     /**
-     * Creates a new parser object.
-     */
-    public function __construct()
-    {
-    }
-    /**
-     * Tokenizes a string and stores the tokens in $this->text.
+     * Creates a new parser object and parses the given text.
      *
-     * @param string $raw_text A text fragment without any HTML markup.
-     *
-     * @return bool Returns `true` on successful completion, `false` otherwise.
+     * @param string $text A text fragment without any HTML markup.
      */
-    public function load($raw_text)
+    public function __construct(string $text)
     {
-        if (!\is_string($raw_text) || \preg_match(self::RE_MAX_STRING_LENGTH, $raw_text)) {
-            // Abort if called on a non-string or the string exceeds 500 characters
-            // (security concern). TODO: Evaluate limit.
-            return \false;
-        }
         // Detect encoding.
-        $str_functions = Strings::functions($raw_text);
-        if (empty($str_functions)) {
-            // TODO: Refactor encoding check.
-            return \false;
-            // unknown encoding.
-        }
-        $this->current_strtoupper = $str_functions['strtoupper'];
+        $this->current_strtoupper = Strings::functions($text)['strtoupper'];
         // Tokenize the raw text parts.
-        $this->text = self::tokenize(\preg_split(self::RE_ANY_TEXT, $raw_text, -1, \PREG_SPLIT_DELIM_CAPTURE | \PREG_SPLIT_NO_EMPTY) ?: []);
-        // phpcs:ignore WordPress.PHP.DisallowShortTernary.Found -- Ensure array type in case of error.
-        // The token array should never be empty.
-        return !empty($this->text);
+        $this->text = self::tokenize(\preg_split(self::RE_ANY_TEXT, $text, -1, \PREG_SPLIT_DELIM_CAPTURE | \PREG_SPLIT_NO_EMPTY) ?: []);
+        // phpcs:ignore Universal.Operators.DisallowShortTernary -- Ensure array type in case of error.
     }
     /**
      * Turns the array of strings into an array of tokens.
@@ -318,19 +296,19 @@ class Text_Parser
                 $tokens[$index] = new Token($part, Token::PUNCTUATION);
             } elseif (\preg_match(self::RE_WORD, $part)) {
                 // Make sure that things like email addresses and URLs are not broken up
-                // into words and punctuation not preceeded by an 'other'.
+                // into words and punctuation not preceded by an 'other'.
                 self::parse_ambiguous_token(Token::WORD, $part, $tokens, $index);
             } else {
                 // Make sure that things like email addresses and URLs are not broken up into words
-                // and punctuation not preceeded by an 'other' or 'word'.
+                // and punctuation not preceded by an 'other' or 'word'.
                 self::parse_ambiguous_token(Token::OTHER, $part, $tokens, $index);
             }
-            $index++;
+            ++$index;
         }
         return $tokens;
     }
     /**
-     * Parse ambigious tokens (that may need to be combined with the predecessors).
+     * Parse ambiguous tokens (that may need to be combined with the predecessors).
      *
      * @param Token::WORD|Token::OTHER $expected_type The expected token type.
      * @param string                   $part          The string fragment to parse.
@@ -340,12 +318,11 @@ class Text_Parser
     protected static function parse_ambiguous_token($expected_type, $part, array &$tokens, &$index): void
     {
         // Make sure that things like email addresses and URLs are not broken up incorrectly.
-        if (self::is_preceeded_by(Token::OTHER, $tokens, $index) || Token::OTHER === $expected_type && self::is_preceeded_by(Token::WORD, $tokens, $index)) {
-            $index--;
-            $old_part = $tokens[$index]->value;
+        if (self::is_preceded_by(Token::OTHER, $tokens, $index) || Token::OTHER === $expected_type && self::is_preceded_by(Token::WORD, $tokens, $index)) {
+            $old_part = $tokens[--$index]->value;
             $tokens[$index] = new Token($old_part . $part, Token::OTHER);
-        } elseif (self::is_preceeded_by(Token::PUNCTUATION, $tokens, $index) && self::is_not_preceeded_by(Token::SPACE, $tokens, $index, 2)) {
-            // Not preceeded by a non-space + punctuation.
+        } elseif (self::is_preceded_by(Token::PUNCTUATION, $tokens, $index) && self::is_not_preceded_by(Token::SPACE, $tokens, $index, 2)) {
+            // Not preceded by a non-space + punctuation.
             $old_part = $tokens[$index - 1]->value;
             $older_part = $tokens[$index - 2]->value;
             $tokens[$index - 2] = new Token($older_part . $old_part . $part, Token::OTHER);
@@ -359,6 +336,8 @@ class Text_Parser
     /**
      * Checks if the predecessor of the current token is of a certain type.
      *
+     * @since 7.0.0 Renamed to `is_preceded_by`.
+     *
      * @param  Token::* $type   A valid token type (e.g. Token::WORD).
      * @param  Token[]  $tokens An array of tokens.
      * @param  int      $index  The current token index.
@@ -366,13 +345,15 @@ class Text_Parser
      *
      * @return bool
      */
-    protected static function is_preceeded_by($type, array $tokens, $index, $steps = 1)
+    protected static function is_preceded_by($type, array $tokens, $index, $steps = 1)
     {
         return $index - $steps >= 0 && $type === $tokens[$index - $steps]->type;
     }
     /**
      * Checks if the predecessor of the current token is not of a certain type.
      *
+     * @since 7.0.0 Renamed to `is_not_preceded_by`.
+     *
      * @param  Token::* $type   A valid token type (e.g. Token::WORD).
      * @param  Token[]  $tokens An array of tokens.
      * @param  int      $index  The current token index.
@@ -380,41 +361,24 @@ class Text_Parser
      *
      * @return bool
      */
-    protected static function is_not_preceeded_by($type, array $tokens, $index, $steps = 1)
+    protected static function is_not_preceded_by($type, array $tokens, $index, $steps = 1)
     {
         return $index - $steps >= 0 && $type !== $tokens[$index - $steps]->type;
     }
     /**
-     * Reloads $this->text (i.e. capture new inserted text, or remove those tokens whose values have been deleted).
+     * Returns the complete text as a string.
      *
-     * Warning: Tokens previously acquired through 'get' methods may not match new tokenization.
-     *
-     * @return bool Returns true on successful completion.
-     */
-    public function reload()
-    {
-        return $this->load($this->unload());
-    }
-    /**
-     * Returns the complete text as a string and clears the parser.
+     * @since 7.0.0
      *
      * @return string
      */
-    public function unload()
+    public function get_text(): string
     {
         $reassembled_text = '';
         foreach ($this->text as $token) {
             $reassembled_text .= $token->value;
         }
-        $this->clear();
         return $reassembled_text;
-    }
-    /**
-     * Clears the currently set text from the parser.
-     */
-    public function clear(): void
-    {
-        $this->text = [];
     }
     /**
      * Updates the 'value' field for all matching tokens.
@@ -465,11 +429,6 @@ class Text_Parser
      */
     public function get_words($abc = self::ALLOW_ALL_LETTERS, $caps = self::ALLOW_ALL_CAPS, $comps = self::ALLOW_COMPOUNDS)
     {
-        // Return early if no text has been loaded.
-        if (empty($this->text)) {
-            return [];
-            // abort.
-        }
         // Result set.
         $tokens = [];
         foreach ($this->get_type(Token::WORD) as $index => $token) {
@@ -568,9 +527,10 @@ class Text_Parser
     }
 }
 /**
- * A class to parse plain text (such as the data of DOMText).
+ * A class to parse plain text (such as the data of DOMText). If multibyte characters are passed,
+ * they must be encoded as UTF-8.
  *
- * Parse_Text assumes no HTML markup in the text (except for special html characters like &gt;).
- * If multibyte characters are passed, they must be encoded as UTF-8.
+ * @since 7.0.0 The `load`, `reload`, and `clear` methods have been removed in favor creating new parser
+ *              objects for each text fragment. The method `unload` has been replaced with `get_text`.
  */
 \class_alias('WP_Typography\Vendor\PHP_Typography\Text_Parser', 'PHP_Typography\Text_Parser', \false);
